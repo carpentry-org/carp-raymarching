@@ -1,0 +1,38 @@
+(load "material.carp")
+
+(doc SceneHit "contains the result of a scene intersection query.")
+(deftype SceneHit [distance Double
+                   material-id Int])
+
+(doc SceneObject "binds a geometric distance function to a material ID.")
+(deftype SceneObject [sdf (Fn [(Ref (Vector3 Double))] Double)
+                      material-id Int])
+
+(doc Scene "manages world composition and identity queries.")
+(defmodule Scene
+  (doc min-hit "finds the closest object in a scene and returns a SceneHit.")
+  (defn min-hit [objects p]
+    (let [min-dist Double.MAX
+          min-id -1]
+      (do
+        (for [i 0 (Array.length objects)]
+          (let [obj (Array.unsafe-nth objects i)
+                d (~(SceneObject.sdf obj) p)]
+            (if (< d min-dist)
+              (do (set! min-dist d) (set! min-id @(SceneObject.material-id obj)))
+              ())))
+        (SceneHit.init min-dist min-id))))
+
+  (doc sdf
+    "returns the global signed distance to the entire scene (convenience wrapper).")
+  (defn sdf [objects p] @(SceneHit.distance &(Scene.min-hit objects p)))
+
+  (doc id
+    "returns the material ID of the closest object at a point (convenience wrapper).")
+  (defn id [objects p] @(SceneHit.material-id &(Scene.min-hit objects p)))
+
+  (doc sample-material "retrieves a material from an array by ID.")
+  (defn sample-material [materials id]
+    (if (and (>= id 0) (< id (Array.length materials)))
+      @(Array.unsafe-nth materials id)
+      (Material.default))))

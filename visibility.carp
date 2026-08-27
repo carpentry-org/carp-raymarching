@@ -1,0 +1,80 @@
+(load "raymarch.carp")
+
+(doc VisibilityConfig
+  "tunes the solver parameters for visibility-dependent effects.")
+(deftype VisibilityConfig
+  [shadow-k Double
+   shadow-steps Int
+   ao-steps Int
+   ao-step-size Double])
+
+(defmodule Visibility
+  (doc shadow "calculates a soft shadow factor using a geometric traversal.")
+  (defn shadow [sdf ray config march-config]
+    (let [res 1.0
+          t @(RaymarchConfig.start-bias march-config)
+          max-t @(RaymarchConfig.max-dist march-config)
+          max-steps @(VisibilityConfig.shadow-steps config)
+          k @(VisibilityConfig.shadow-k config)
+          eps @(RaymarchConfig.hit-threshold march-config)
+          steps 0
+          ro (Ray.origin ray)
+          rd (Ray.direction ray)]
+      (do
+        (while (and (< t max-t) (< steps max-steps))
+          (do
+            (let [h (~sdf &(Vector3.add ro &(Vector3.mul rd t)))]
+              (do
+                (if (< h eps)
+                  (do (set! res 0.0) (break))
+                  (set! res (Double.min res (/ (* k h) t))))
+                (set! t
+                      (+ t
+                         (Double.max h @(RaymarchConfig.min-step march-config))))))
+            (set! steps (inc steps))))
+        res)))
+
+  (doc ambient-occlusion
+    "estimates ambient occlusion at a point using a surface-offset traversal.")
+  (defn ambient-occlusion [sdf ray config]
+    (let [occ 0.0
+          sca 1.0
+          p (Ray.origin ray)
+          n (Ray.direction ray)
+          steps @(VisibilityConfig.ao-steps config)
+          step-size @(VisibilityConfig.ao-step-size config)]
+      (do
+        (for [i 1 (inc steps)]
+          (let [h (* (Double.from-int i) step-size)
+                d (~sdf &(Vector3.add p &(Vector3.mul n h)))]
+            (do (set! occ (+ occ (* sca (- h d)))) (set! sca (* sca 0.5)))))
+        (Double.clamp 0.0 1.0 (- 1.0 occ)))))
+
+  (defn default-config [] (VisibilityConfig.init 16.0 32 5 0.1))
+
+  (defmodule Wgsl
+    (def core
+      "fn shadow(p: vec3<f32>, light_dir: vec3<f32>, min_t: f32, max_t: f32, k: f32, max_steps: u32, eps: f32) -> f32 {
+    var res = 1.0;
+    var t = min_t;
+    for (var i: u32 = 0u; i < max_steps; i++) {
+        let h = worldSDF(p + light_dir * t);
+        if (h < eps) { return 0.0; }
+        res = min(res, k * h / t);
+        t += max(h, eps);
+        if (t > max_t) { break; }
+    }
+    return res;
+}
+
+fn ambientOcclusion(p: vec3<f32>, n: vec3<f32>, step_size: f32, steps: u32) -> f32 {
+    var occ = 0.0;
+    var sca = 1.0;
+    for (var i: u32 = 1u; i <= steps; i++) {
+        let h = f32(i) * step_size;
+        let d = worldSDF(p + n * h);
+        occ += sca * (h - d);
+        sca *= 0.5;
+    }
+    return clamp(1.0 - occ, 0.0, 1.0);
+}")))

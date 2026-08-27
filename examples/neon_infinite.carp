@@ -1,0 +1,148 @@
+(load "../sdf.carp")
+(load "../renderer.carp")
+(use Vector3)
+(use Double)
+(use Sdf)
+
+;; --- Object Definitions ---
+
+(defn artifact-sdf [p]
+  (let [p-rep (Sdf.repeat p &(Vector3.init 5.0 0.0 5.0))
+        box (Sdf.box &p-rep &(Vector3.init 0.4 0.4 0.4))
+        sph (Sdf.sphere &p-rep 0.5)]
+    (Sdf.subtract box sph)))
+
+(defn floor-sdf [p] (Sdf.plane p &(Vector3.init 0.0 1.0 0.0) 1.0))
+
+;; --- Global Queries ---
+
+(def world-objects (the (Array SceneObject) []))
+
+(defn world-sdf [p] (Scene.sdf &world-objects p))
+(defn world-hit [p] (Scene.min-hit &world-objects p))
+
+;; --- Recursive Trace ---
+
+(defn trace [ray materials config depth]
+  (if (>= depth 2)
+    (Vector3.init 0.0 0.0 0.0)
+    (let [m-config (RenderConfig.march config)
+          hit (Raymarch.march &world-sdf ray m-config)]
+      (if @(RaymarchHit.hit &hit)
+        (let [p (RaymarchHit.p &hit)
+              n (RaymarchHit.normal &hit)
+              dist @(RaymarchHit.t &hit)
+              scene-hit (world-hit p)
+              mat (Scene.sample-material materials
+                                         @(SceneHit.material-id &scene-hit))
+              ;; Setup light (Strong sun-like light)
+              light (Light.init (Vector3.init 50.0 100.0 50.0)
+                                (Vector3.init 0.9 0.9 1.0))
+              lit-color (Renderer.shade-hit &world-sdf ray p n mat &light config)
+              ;; Reflection
+              reflect-factor @(Material.reflectivity mat)
+              final-color (if (> reflect-factor 0.001)
+                (let [reflect-dir (Vector3.normalize
+                        &(Vector3.sub (Ray.direction ray)
+                                      &(Vector3.mul n
+                                                    (* 2.0
+                                                       (Vector3.dot (Ray.direction ray)
+                                                                    n)))))
+                      reflect-ray (Ray.make (Vector3.add p &(Vector3.mul n 0.01))
+                                            reflect-dir)
+                      reflect-color (trace &reflect-ray
+                                           materials
+                                           config
+                                           (inc depth))
+                      diff-part (Vector3.mul &lit-color (- 1.0 reflect-factor))
+                      refl-part (Vector3.mul &reflect-color reflect-factor)]
+                  (Vector3.add &diff-part &refl-part))
+                lit-color)]
+          ;; Thin fog for atmospheric depth
+          (Shading.apply-fog &final-color
+                             &(Vector3.init 0.01 0.01 0.02)
+                             dist
+                             0.005))
+        (Vector3.init 0.01 0.01 0.02)))))
+
+;; --- Main Renderer ---
+
+(defn main []
+  (let [width 400
+        height 300
+        m-config (RaymarchConfig.init 300 1000.0 0.001 0.001 0.01)
+        config (RenderConfig.init m-config (Visibility.default-config))
+        materials [(Material.make-emissive (Vector3.init 0.0 0.0 0.0)
+                                           0.1
+                                           0.0
+                                           0.2
+                                           (Vector3.init 0.0 4.0 10.0))
+                   ;; Pure Neon Cyan
+                   (Material.make (Vector3.init 0.1 0.1 0.1) 0.01 0.5 0.9)]
+        ;; Black Mirror Floor
+        cam-pos (Vector3.init 0.0 2.0 10.0)
+        cam-target (Vector3.init 0.0 0.0 -100.0)
+        ;; Looking directly down the center lane
+        res (IO.open-file "examples/neon_infinite.ppm" "w")]
+    (do
+      (set! world-objects
+            [(SceneObject.init
+               (the (Fn [(Ref (Vector3 Double))] Double) artifact-sdf)
+               0)
+             (SceneObject.init
+               (the (Fn [(Ref (Vector3 Double))] Double) floor-sdf)
+               1)])
+
+      (match res
+        (Result.Error e) (do (IO.println &(str* "Error: " e)) 1)
+        (Result.Success file)
+          (do
+            (IO.println "Rendering Neon Infinite Grid (Stabilized)...")
+            (IO.fwrite! "P3
+" 1 3 file)
+            (IO.fwrite! "400 300
+" 1 8 file)
+            (IO.fwrite! "255
+" 1 4 file)
+
+            (for [y 0 height]
+              (do
+                (when (= 0 (Int.mod y 50))
+                  (IO.println &(str* "Rendering line " (Int.str y))))
+                (for [x 0 width]
+                  (let [uv-x (/
+                          (- (* 2.0 (Double.from-int x)) (Double.from-int width))
+                          (Double.from-int height))
+                        uv-y (/
+                          (- (Double.from-int (- height y))
+                             (* 0.5 (Double.from-int height)))
+                          (Double.from-int height))
+                        cw (Vector3.normalize &(Vector3.sub &cam-target &cam-pos))
+                        cp (Vector3.init 0.0 1.0 0.0)
+                        cu (Vector3.normalize &(Vector3.cross &cw &cp))
+                        cv (Vector3.normalize &(Vector3.cross &cu &cw))
+                        u-part (Vector3.mul &cu uv-x)
+                        v-part (Vector3.mul &cv uv-y)
+                        w-part (Vector3.mul &cw 1.5)
+                        dir (Vector3.normalize
+                          &(Vector3.add &(Vector3.add &u-part &v-part) &w-part))
+                        ray (Ray.make @&cam-pos dir)
+                        color (trace &ray &materials &config 0)
+                        r (Double.to-int
+                          (Double.clamp 0.0 255.0 (* 255.0 @(Vector3.x &color))))
+                        g (Double.to-int
+                          (Double.clamp 0.0 255.0 (* 255.0 @(Vector3.y &color))))
+                        b (Double.to-int
+                          (Double.clamp 0.0 255.0 (* 255.0 @(Vector3.z &color))))
+                        pixel-str (str* (Int.str r)
+                                        " "
+                                        (Int.str g)
+                                        " "
+                                        (Int.str b)
+                                        "
+")]
+                    (IO.fwrite! &pixel-str 1 (String.length &pixel-str) file)))))
+
+            (ignore (IO.fclose file))
+            (IO.println "Done! Saved to examples/neon_infinite.ppm")
+            0)))))

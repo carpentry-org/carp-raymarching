@@ -1,0 +1,84 @@
+(load "Test.carp")
+(use Test)
+(load "../svo.carp")
+(use Svo)
+
+(deftest svo-test
+  (let [state (Test.State.init 0 0)]
+    (let [origin (Vector3.init 0.0 0.0 0.0)
+          size 10.0
+          max-depth 3
+          tree (Svo.new @&origin size max-depth 0)
+          ;; 1. Verify root node default payload index (0) is sampled correctly
+          s1 (assert-equal &state
+            0
+            (Svo.sample &tree &(Vector3.init 5.0 5.0 5.0))
+            "Root default-val sample")
+          ;; 2. Verify deep insertion and subdivision works, storing payload index 42
+          _insert (Svo.insert! &tree &(Vector3.init 1.5 2.5 3.5) 42)
+          s2 (assert-equal &s1
+            42
+            (Svo.sample &tree &(Vector3.init 1.5 2.5 3.5))
+            "Set value inside octree leaf")
+          ;; 3. Verify other untouched regions retain the default payload index (0)
+          s3 (assert-equal &s2
+            0
+            (Svo.sample &tree &(Vector3.init 8.0 8.0 8.0))
+            "Sample untouched sibling node")
+          ;; 4. Verify boundary checking (out of bounds pos returns default index 0)
+          s4 (assert-equal &s3
+            0
+            (Svo.sample &tree &(Vector3.init 12.0 5.0 5.0))
+            "Out of bounds sample")
+          ;; 5. Verify clearing resets the SVO back to default index 0
+          _clear (Svo.clear! &tree)
+          s5 (assert-equal &s4
+            0
+            (Svo.sample &tree &(Vector3.init 1.5 2.5 3.5))
+            "Clear resets SVO back to default")
+          ;; 6. Verify pruning collapses identical sibling leaves
+          tree-prune (Svo.new @&origin size 1 0)
+          _i0 (Svo.insert! &tree-prune &(Vector3.init 2.0 2.0 2.0) 42)
+          _i1 (Svo.insert! &tree-prune &(Vector3.init 7.0 2.0 2.0) 42)
+          _i2 (Svo.insert! &tree-prune &(Vector3.init 2.0 7.0 2.0) 42)
+          _i3 (Svo.insert! &tree-prune &(Vector3.init 7.0 7.0 2.0) 42)
+          _i4 (Svo.insert! &tree-prune &(Vector3.init 2.0 2.0 7.0) 42)
+          _i5 (Svo.insert! &tree-prune &(Vector3.init 7.0 2.0 7.0) 42)
+          _i6 (Svo.insert! &tree-prune &(Vector3.init 2.0 7.0 7.0) 42)
+          _i7 (Svo.insert! &tree-prune &(Vector3.init 7.0 7.0 7.0) 42)
+          _prune (Svo.prune! &tree-prune)
+          s6 (assert-equal &s5
+            42
+            (Svo.sample &tree-prune &(Vector3.init 5.0 5.0 5.0))
+            "Pruned tree returns collapsed val")
+          ;; 7. Verify AABB queries
+          tree-query (Svo.new @&origin size 3 0)
+          _iq (Svo.insert! &tree-query &(Vector3.init 1.5 2.5 3.5) 99)
+          results-aabb []
+          _q-aabb (Svo.query-aabb! &tree-query
+                                   &(Vector3.init 0.0 0.0 0.0)
+                                   &(Vector3.init 3.0 3.0 3.0)
+                                   &results-aabb)
+          s7 (assert-equal &s6
+            1
+            (Array.length &results-aabb)
+            "AABB query finds inserted element")
+          s8 (assert-equal &s7
+            99
+            @(Array.unsafe-nth &results-aabb 0)
+            "AABB query matches value")
+          ;; 8. Verify sphere queries
+          results-sphere []
+          _q-sphere (Svo.query-sphere! &tree-query
+                                       &(Vector3.init 2.0 2.0 2.0)
+                                       2.0
+                                       &results-sphere)
+          s9 (assert-equal &s8
+            1
+            (Array.length &results-sphere)
+            "Sphere query finds element in range")
+          s10 (assert-equal &s9
+            99
+            @(Array.unsafe-nth &results-sphere 0)
+            "Sphere query matches value")]
+      s10)))

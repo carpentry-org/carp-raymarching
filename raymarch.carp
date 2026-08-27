@@ -1,0 +1,121 @@
+(load "Vector.carp")
+(use Double)
+(use Vector3)
+
+(doc Ray "represents a 3D ray with an origin and a normalized direction.")
+(deftype Ray [origin (Vector3 Double)
+              direction (Vector3 Double)])
+
+(defmodule Ray
+  (doc make "creates a Ray and ensures the direction is normalized.")
+  (defn make [o d] (Ray.init o (Vector3.normalize &d))))
+
+(doc RaymarchHit "contains the results of a raymarching traversal.")
+(deftype RaymarchHit
+  [p (Vector3 Double)
+   ;; Hit position
+   normal (Vector3 Double)
+   ;; Surface normal at hit
+   t Double
+   ;; Distance traveled
+   steps Int
+   ;; Number of iterations performed
+   hit Bool
+   ;; True if a surface was encountered
+  ])
+
+(doc RaymarchConfig
+  "tunes the raymarching algorithm's performance and accuracy.")
+(deftype RaymarchConfig
+  [max-steps Int
+   max-dist Double
+   hit-threshold Double
+   min-step Double
+   start-bias Double])
+
+(defmodule Raymarch
+  (doc default-config "returns a standard balanced traversal configuration.")
+  (defn default-config [] (RaymarchConfig.init 128 100.0 0.001 0.0001 0.01))
+
+  (doc estimate-normal
+    "calculates the surface normal at point 'p' using finite differences.
+Scale awareness is provided by the 'eps' parameter.")
+  (defn estimate-normal [sdf p eps]
+    (let [ex (Vector3.init eps 0.0 0.0)
+          ey (Vector3.init 0.0 eps 0.0)
+          ez (Vector3.init 0.0 0.0 eps)
+          dx (- (~sdf &(Vector3.add p &ex)) (~sdf &(Vector3.sub p &ex)))
+          dy (- (~sdf &(Vector3.add p &ey)) (~sdf &(Vector3.sub p &ey)))
+          dz (- (~sdf &(Vector3.add p &ez)) (~sdf &(Vector3.sub p &ez)))]
+      (Vector3.normalize &(Vector3.init dx dy dz))))
+
+  (doc march
+    "traverses space using the 'sdf' function until a surface is hit or 'max-dist' is reached.")
+  (defn march [sdf ray config]
+    (let [ro (Ray.origin ray)
+          rd (Ray.direction ray)
+          t (max @(RaymarchConfig.start-bias config)
+                 @(RaymarchConfig.hit-threshold config))
+          p (Vector3.init 0.0 0.0 0.0)
+          hit false
+          steps 0
+          max-s @(RaymarchConfig.max-steps config)
+          max-d @(RaymarchConfig.max-dist config)
+          hit-eps @(RaymarchConfig.hit-threshold config)
+          step-eps @(RaymarchConfig.min-step config)]
+      (do
+        (while (and (< steps max-s) (< t max-d))
+          (do
+            (set! p (Vector3.add ro &(Vector3.mul rd t)))
+            (let [d (~sdf &p)]
+              (do
+                (if (< d hit-eps)
+                  (do (set! hit true) (break))
+                  (set! t (+ t (max d step-eps))))
+                (set! steps (inc steps))))))
+        (let [norm (if hit
+                (Raymarch.estimate-normal sdf &p hit-eps)
+                (Vector3.init 0.0 0.0 0.0))]
+          (RaymarchHit.init p norm t steps hit)))))
+
+  (doc Wgsl "provides canonical WGSL snippets for the raymarching core.")
+  (defmodule Wgsl (def core "struct RaymarchHit {
+    p: vec3<f32>,
+    normal: vec3<f32>,
+    t: f32,
+    steps: u32,
+    hit: bool,
+    material_id: i32,
+}
+
+fn estimateNormal(p: vec3<f32>, eps: f32) -> vec3<f32> {
+    let e = vec2<f32>(eps, 0.0);
+    return normalize(vec3<f32>(
+        worldSDF(p + e.xyy) - worldSDF(p - e.xyy),
+        worldSDF(p + e.yxy) - worldSDF(p - e.yxy),
+        worldSDF(p + e.yyx) - worldSDF(p - e.yyx)
+    ));
+}
+
+fn march(ro: vec3<f32>, ray_rd: vec3<f32>, max_steps: u32, max_dist: f32, hit_eps: f32, step_eps: f32, start_bias: f32) -> RaymarchHit {
+    let rd = normalize(ray_rd);
+    var t = max(start_bias, hit_eps);
+    var res = RaymarchHit(vec3<f32>(0.0), vec3<f32>(0.0), 0.0, 0u, false, -1);
+    
+    for (var i: u32 = 0u; i < max_steps; i++) {
+        res.steps = i;
+        res.p = ro + rd * t;
+        let d = worldSDF(res.p);
+        if (d < hit_eps) {
+            res.hit = true;
+            res.normal = estimateNormal(res.p, hit_eps);
+            res.t = t;
+            res.material_id = worldMaterial(res.p);
+            return res;
+        }
+        t += max(d, step_eps);
+        if (t > max_dist) { break; }
+    }
+    res.t = t;
+    return res;
+}")))

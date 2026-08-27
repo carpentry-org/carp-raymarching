@@ -1,0 +1,121 @@
+(load "../renderer.carp")
+(use Vector3)
+(use Double)
+
+;; --- Scene Objects ---
+
+(defn sphere-sdf [p] (- (Vector3.mag p) 1.0))
+
+(defn plane-sdf [p] (+ @(Vector3.y p) 1.0))
+
+;; --- Global Queries ---
+
+(def world-objects (the (Array SceneObject) []))
+
+(defn world-sdf [p] (Scene.sdf &world-objects p))
+
+(defn world-hit [p] (Scene.min-hit &world-objects p))
+
+;; --- Recursive Trace (Concrete) ---
+
+(defn trace [ray materials config depth]
+  (if (>= depth 3)
+    (Vector3.init 0.0 0.0 0.0)
+    (let [m-config (RenderConfig.march config)
+          hit (Raymarch.march &world-sdf ray m-config)]
+      (if @(RaymarchHit.hit &hit)
+        (let [p (RaymarchHit.p &hit)
+              n (RaymarchHit.normal &hit)
+              scene-hit (world-hit p)
+              mat (Scene.sample-material materials
+                                         @(SceneHit.material-id &scene-hit))
+              ;; Setup light
+              light (Light.init (Vector3.init 10.0 10.0 10.0)
+                                (Vector3.init 1.0 1.0 1.0))
+              lit-color (Renderer.shade-hit &world-sdf
+                                            ray
+                                            p
+                                            n
+                                            &mat
+                                            &light
+                                            config)
+              reflect-factor @(Material.reflectivity &mat)]
+          (if (> reflect-factor 0.001)
+            (let [reflect-dir (Vector3.normalize
+                    &(Vector3.sub (Ray.direction ray)
+                                  &(Vector3.mul n
+                                                (* 2.0
+                                                   (Vector3.dot (Ray.direction ray)
+                                                                n)))))
+                  reflect-ray (Ray.make (Vector3.add p &(Vector3.mul n 0.01))
+                                        reflect-dir)
+                  reflect-color (trace &reflect-ray materials config (inc depth))
+                  diff-part (Vector3.mul &lit-color (- 1.0 reflect-factor))
+                  refl-part (Vector3.mul &reflect-color reflect-factor)]
+              (Vector3.add &diff-part &refl-part))
+            lit-color))
+        (Vector3.init 0.05 0.05 0.08)))))
+
+;; --- Main Renderer ---
+
+(defn main []
+  (let [width 800
+        height 600
+        config (Renderer.default-config)
+        materials [(Material.make (Vector3.init 1.0 0.2 0.2) 0.1 0.5 0.5)
+                   ;; Red Reflective Sphere
+                   (Material.make (Vector3.init 0.5 0.5 0.5) 0.8 0.0 0.0)]
+        ;; Grey Matte Floor
+        cam-pos (Vector3.init 0.0 0.0 5.0)
+        res (IO.open-file "examples/red_sphere.ppm" "w")]
+    (do
+      (set! world-objects
+            [(SceneObject.init
+               (the (Fn [(Ref (Vector3 Double))] Double) sphere-sdf)
+               0)
+             (SceneObject.init
+               (the (Fn [(Ref (Vector3 Double))] Double) plane-sdf)
+               1)])
+
+      (match res
+        (Result.Error e) (do (IO.println &(str* "Error: " e)) 1)
+        (Result.Success file)
+          (do
+            (IO.println "Starting render with reflections...")
+            (IO.fwrite! "P3
+" 1 3 file)
+            (IO.fwrite! "800 600
+" 1 8 file)
+            (IO.fwrite! "255
+" 1 4 file)
+
+            (for [y 0 height]
+              (do
+                (when (= 0 (Int.mod y 50))
+                  (IO.println &(str* "Rendering line " (Int.str y))))
+                (for [x 0 width]
+                  (let [uv-x (/
+                          (- (* 2.0 (Double.from-int x)) (Double.from-int width))
+                          (Double.from-int height))
+                        uv-y (/
+                          (- (Double.from-int (- height y))
+                             (* 0.5 (Double.from-int height)))
+                          (Double.from-int height))
+                        dir (Vector3.normalize &(Vector3.init uv-x uv-y -1.0))
+                        ray (Ray.make @&cam-pos dir)
+                        color (trace &ray &materials &config 0)
+                        r (Double.to-int (* 255.0 @(Vector3.x &color)))
+                        g (Double.to-int (* 255.0 @(Vector3.y &color)))
+                        b (Double.to-int (* 255.0 @(Vector3.z &color)))
+                        pixel-str (str* (Int.str r)
+                                        " "
+                                        (Int.str g)
+                                        " "
+                                        (Int.str b)
+                                        "
+")]
+                    (IO.fwrite! &pixel-str 1 (String.length &pixel-str) file)))))
+
+            (ignore (IO.fclose file))
+            (IO.println "Render complete! Saved to examples/red_sphere.ppm")
+            0)))))

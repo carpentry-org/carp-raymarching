@@ -1,0 +1,35 @@
+(load "material.carp")
+(use Vector3)
+(use Double)
+
+(doc Light "represents a point light source.")
+(deftype Light [pos (Vector3 Double)
+                color (Vector3 Double)])
+
+(doc Shading "provides pure equations for surface lighting.")
+(defmodule Shading
+  (doc lambert "calculates basic diffuse reflection.")
+  (defn lambert [normal light-dir albedo]
+    (let [diff (Double.max 0.0 (Vector3.dot normal light-dir))]
+      (Vector3.mul albedo diff)))
+
+  (doc blinn-phong "calculates diffuse and specular reflection.")
+  (defn blinn-phong [normal light-dir view-dir albedo roughness metallic]
+    (let [n normal
+          l light-dir
+          v view-dir
+          h (Vector3.normalize &(Vector3.add l v))
+          diff (Double.max 0.0 (Vector3.dot n l))
+          spec (Double.pow (Double.max 0.0 (Vector3.dot n &h))
+                           (/ 100.0 (+ 0.0001 roughness)))
+          diff-part (Vector3.mul albedo diff)
+          spec-part (Vector3.init spec spec spec)]
+      (Vector3.add &diff-part &spec-part)))
+
+  (doc apply-occlusion "modulates a color by shadow and AO factors.")
+  (defn apply-occlusion [color shadow ao] (Vector3.mul color (* shadow ao)))
+
+  (doc apply-fog "blends a color with a background/fog color based on distance.")
+  (defn apply-fog [color fog-color dist density]
+    (let [amount (- 1.0 (Double.exp (* -1.0 (* dist density))))]
+      (Vector3.vlerp color fog-color (Double.clamp 0.0 1.0 amount)))))

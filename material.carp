@@ -1,0 +1,29 @@
+(load "Vector.carp")
+(use Vector3)
+
+(doc Material "represents the visual properties of a surface.")
+(deftype Material
+  [albedo (Vector3 Double)
+   roughness Double
+   metallic Double
+   reflectivity Double
+   emission (Vector3 Double)])
+
+(defmodule Material
+  (defn make [albedo roughness metallic reflectivity]
+    (Material.init albedo
+                   roughness
+                   metallic
+                   reflectivity
+                   (Vector3.init 0.0 0.0 0.0)))
+
+  (defn make-emissive [albedo roughness metallic reflectivity emit]
+    (Material.init albedo roughness metallic reflectivity emit))
+
+  (doc default "returns a neutral grey material.")
+  (defn default []
+    (Material.init (Vector3.init 0.5 0.5 0.5)
+                   0.5
+                   0.0
+                   0.0
+                   (Vector3.init 0.0 0.0 0.0))))

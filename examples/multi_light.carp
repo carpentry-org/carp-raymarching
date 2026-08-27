@@ -1,0 +1,102 @@
+(load "../renderer.carp")
+(use Vector3)
+(use Double)
+
+;; --- Scene Definition ---
+
+(defn sphere-sdf [p] (- (Vector3.mag p) 1.5))
+
+(defn plane-sdf [p] (+ @(Vector3.y p) 1.5))
+
+(defn world-sdf [p] (Double.min (sphere-sdf p) (plane-sdf p)))
+
+(defn world-hit [p]
+  (if (< (sphere-sdf p) (plane-sdf p))
+    (SceneHit.init (sphere-sdf p) 0)
+    (SceneHit.init (plane-sdf p) 1)))
+
+;; --- Main Renderer ---
+
+(defn main []
+  (let [width 400
+        height 300
+        config (Renderer.default-config)
+        materials [(Material.make (Vector3.init 1.0 1.0 1.0) 0.1 0.5 0.2)
+                   ;; White Sphere
+                   (Material.make (Vector3.init 0.5 0.5 0.5) 0.9 0.0 0.0)]
+        ;; Grey Floor
+        ;; Two colored lights
+        light1 (Light.init (Vector3.init 10.0 10.0 10.0)
+                           (Vector3.init 1.0 0.5 0.5))
+        ;; Warm
+        light2 (Light.init (Vector3.init -10.0 5.0 5.0)
+                           (Vector3.init 0.5 0.5 1.0))
+        ;; Cool
+        cam-pos (Vector3.init 0.0 2.0 8.0)
+        res (IO.open-file "examples/multi_light.ppm" "w")]
+    (match res
+      (Result.Error e) (do (IO.println &(str* "Error: " e)) 1)
+      (Result.Success file)
+        (do
+          (IO.println "Rendering Multi-Light Scene...")
+          (IO.fwrite! "P3
+" 1 3 file)
+          (IO.fwrite! "400 300
+" 1 8 file)
+          (IO.fwrite! "255
+" 1 4 file)
+
+          (for [y 0 height]
+            (do
+              (when (= 0 (Int.mod y 50))
+                (IO.println &(str* "Rendering line " (Int.str y))))
+              (for [x 0 width]
+                (let [uv-x (/
+                        (- (* 2.0 (Double.from-int x)) (Double.from-int width))
+                        (Double.from-int height))
+                      uv-y (/
+                        (- (Double.from-int (- height y))
+                           (* 0.5 (Double.from-int height)))
+                        (Double.from-int height))
+                      dir (Vector3.normalize &(Vector3.init uv-x uv-y -1.0))
+                      ray (Ray.make @&cam-pos dir)
+                      m-config (RenderConfig.march &config)
+                      hit (Raymarch.march &world-sdf &ray m-config)]
+                  (let [color (if @(RaymarchHit.hit &hit)
+                          (let [p (RaymarchHit.p &hit)
+                                n (RaymarchHit.normal &hit)
+                                scene-hit (world-hit p)
+                                mat (Scene.sample-material &materials
+                                                           @(SceneHit.material-id &scene-hit))
+                                ;; Accumulate lights
+                                c1 (Renderer.shade-hit &world-sdf
+                                                       &ray
+                                                       p
+                                                       n
+                                                       mat
+                                                       &light1
+                                                       &config)
+                                c2 (Renderer.shade-hit &world-sdf
+                                                       &ray
+                                                       p
+                                                       n
+                                                       mat
+                                                       &light2
+                                                       &config)]
+                            (Vector3.add &c1 &c2))
+                          (Vector3.init 0.02 0.02 0.03))]
+                    (let [r (Double.to-int (* 255.0 @(Vector3.x &color)))
+                          g (Double.to-int (* 255.0 @(Vector3.y &color)))
+                          b (Double.to-int (* 255.0 @(Vector3.z &color)))
+                          pixel-str (str* (Int.str r)
+                                          " "
+                                          (Int.str g)
+                                          " "
+                                          (Int.str b)
+                                          "
+")]
+                      (IO.fwrite! &pixel-str 1 (String.length &pixel-str) file)))))))
+
+          (ignore (IO.fclose file))
+          (IO.println "Done! Saved to examples/multi_light.ppm")
+          0))))

@@ -1,0 +1,236 @@
+(load "Vector.carp")
+(use Double)
+(use Vector2)
+(use Vector3)
+
+(doc Sdf "is a module for Signed Distance Field (SDF) mathematics.
+
+### Sign Convention
+- **Negative values**: Inside the surface.
+- **Positive values**: Outside the surface.
+- **Zero**: On the surface boundary.")
+(defmodule Sdf
+  ;; --- Primitives ---
+
+  (doc sphere "returns the signed distance to a sphere at the origin.")
+  (defn sphere [p r] (- (Vector3.mag p) r))
+
+  (doc box
+    "returns the signed distance to a 3D box at the origin with half-dimensions 'b'.")
+  (defn box [p b]
+    (let [px (abs @(Vector3.x p))
+          py (abs @(Vector3.y p))
+          pz (abs @(Vector3.z p))
+          bx @(Vector3.x b)
+          by @(Vector3.y b)
+          bz @(Vector3.z b)
+          qx (- px bx)
+          qy (- py by)
+          qz (- pz bz)
+          q_max (Vector3.init (max 0.0 qx) (max 0.0 qy) (max 0.0 qz))]
+      (+ (Vector3.mag &q_max) (min 0.0 (max qx (max qy qz))))))
+
+  (doc torus
+    "returns the signed distance to a torus with major radius 'tx' and minor radius 'ty'.")
+  (defn torus [p t]
+    (let [qx (-
+            (sqrt
+              (+ (* @(Vector3.x p) @(Vector3.x p))
+                 (* @(Vector3.z p) @(Vector3.z p))))
+            @(Vector2.x t))
+          qy @(Vector3.y p)]
+      (- (sqrt (+ (* qx qx) (* qy qy))) @(Vector2.y t))))
+
+  (doc capsule
+    "returns the signed distance to a capsule between points 'a' and 'b' with radius 'r'.
+Correctly handles degenerate segments (a == b) by treating them as spheres.")
+  (defn capsule [p a b r]
+    (let [pa (Vector3.sub p a)
+          ba (Vector3.sub b a)
+          denom (Vector3.dot &ba &ba)]
+      (if (< denom 0.000001)
+        (- (Vector3.mag &pa) r)
+        (let [h (Double.clamp 0.0 1.0 (/ (Vector3.dot &pa &ba) denom))]
+          (- (Vector3.mag &(Vector3.sub &pa &(Vector3.mul &ba h))) r)))))
+
+  (doc cylinder
+    "returns the signed distance to a vertical cylinder with radius 'r' and height 'h'.")
+  (defn cylinder [p r h]
+    (let [d (Vector2.init
+            (-
+              (sqrt
+                (+ (* @(Vector3.x p) @(Vector3.x p))
+                   (* @(Vector3.z p) @(Vector3.z p))))
+              r)
+            (- (abs @(Vector3.y p)) h))
+          d_max (Vector2.init (max 0.0 @(Vector2.x &d))
+                              (max 0.0 @(Vector2.y &d)))]
+      (+ (Vector2.mag &d_max) (min 0.0 (max @(Vector2.x &d) @(Vector2.y &d))))))
+
+  (doc plane
+    "returns the signed distance to a plane with normal 'n' (must be normalized) and distance from origin 'h'.")
+  (defn plane [p n h] (+ (Vector3.dot p n) h))
+
+  ;; --- Operators ---
+
+  (doc union "returns the union of two distance fields (A ∪ B).")
+  (defn union [a b] (min a b))
+
+  (doc subtract "returns the subtraction of field B from A (A - B).")
+  (defn subtract [a b] (max a (- 0.0 b)))
+
+  (doc intersect "returns the intersection of two distance fields (A ∩ B).")
+  (defn intersect [a b] (max a b))
+
+  (doc smooth-union
+    "returns a smooth union of two distance fields (IQ formulation).
+Handles k=0 by falling back to standard union.")
+  (defn smooth-union [a b k]
+    (if (< (abs k) 0.000001)
+      (min a b)
+      (let [h (Double.clamp 0.0 1.0 (+ 0.5 (* 0.5 (/ (- b a) k))))]
+        (- (lerp b a h) (* k (* h (- 1.0 h)))))))
+
+  (doc smooth-subtract "returns a smooth subtraction (A - B).
+Handles k=0 by falling back to standard subtract.")
+  (defn smooth-subtract [a b k]
+    (if (< (abs k) 0.000001)
+      (max a (- 0.0 b))
+      (let [h (Double.clamp 0.0 1.0 (+ 0.5 (* 0.5 (/ (+ b a) k))))]
+        (+ (lerp b (- 0.0 a) h) (* k (* h (- 1.0 h)))))))
+
+  (doc smooth-intersect "returns a smooth intersection (A ∩ B).
+Handles k=0 by falling back to standard intersect.")
+  (defn smooth-intersect [a b k]
+    (if (< (abs k) 0.000001)
+      (max a b)
+      (let [h (Double.clamp 0.0 1.0 (+ 0.5 (* 0.5 (/ (- b a) k))))]
+        (+ (lerp b a h) (* k (* h (- 1.0 h)))))))
+
+  (doc round "rounds the corners of an SDF shape by radius 'r'.")
+  (defn round [d r] (- d r))
+
+  (doc onion "hollows out an SDF shape to a specific thickness.")
+  (defn onion [d thickness] (- (abs d) thickness))
+
+  ;; --- Transformations ---
+
+  (doc translate "offsets a point 'p' by vector 't' for use in an SDF query.")
+  (defn translate [p t] (Vector3.sub p t))
+
+  (doc repeat
+    "repeats space infinitely with a period 'c'. A component of 0.0 in 'c' skips repetition on that axis.")
+  (defn repeat [p c]
+    (let [rx @(Vector3.x c)
+          ry @(Vector3.y c)
+          rz @(Vector3.z c)
+          px @(Vector3.x p)
+          py @(Vector3.y p)
+          pz @(Vector3.z p)
+          qx (if (> (abs rx) 0.000001)
+            (- px (* rx (floor (+ (/ px rx) 0.5))))
+            px)
+          qy (if (> (abs ry) 0.000001)
+            (- py (* ry (floor (+ (/ py ry) 0.5))))
+            py)
+          qz (if (> (abs rz) 0.000001)
+            (- pz (* rz (floor (+ (/ pz rz) 0.5))))
+            pz)]
+      (Vector3.init qx qy qz)))
+
+  (doc scale-space "scales the query space by factor 's'.
+
+Note: This only transforms the coordinate space. To preserve correct distances,
+you must multiply the final SDF result by 's'. 
+Example: (* s (Sdf.sphere (Sdf.scale-space p s) r))")
+  (defn scale-space [p s] (Vector3.mul p (/ 1.0 s)))
+
+  (defn rotate-x [p a]
+    (let [c (cos a)
+          s (sin a)
+          y @(Vector3.y p)
+          z @(Vector3.z p)]
+      (Vector3.init @(Vector3.x p) (- (* c y) (* s z)) (+ (* s y) (* c z)))))
+
+  (defn rotate-y [p a]
+    (let [c (cos a)
+          s (sin a)
+          x @(Vector3.x p)
+          z @(Vector3.z p)]
+      (Vector3.init (+ (* c x) (* s z)) @(Vector3.y p) (- (* c z) (* s x)))))
+
+  (defn rotate-z [p a]
+    (let [c (cos a)
+          s (sin a)
+          x @(Vector3.x p)
+          y @(Vector3.y p)]
+      (Vector3.init (- (* c x) (* s y)) (+ (* s x) (* c y)) @(Vector3.z p))))
+
+  (defmodule Wgsl
+    (def sphere
+      "fn sdSphere(p: vec3<f32>, r: f32) -> f32 { return length(p) - r; }")
+
+    (def box "fn sdBox(p: vec3<f32>, b: vec3<f32>) -> f32 {
+  let q = abs(p) - b;
+  return length(max(q, vec3<f32>(0.0))) + min(max(q.x, max(q.y, q.z)), 0.0);
+}")
+
+    (def torus "fn sdTorus(p: vec3<f32>, t: vec2<f32>) -> f32 {
+  let q = vec2<f32>(length(p.xz) - t.x, p.y);
+  return length(q) - t.y;
+}")
+
+    (def capsule
+      "fn sdCapsule(p: vec3<f32>, a: vec3<f32>, b: vec3<f32>, r: f32) -> f32 {
+  let pa = p - a; let ba = b - a;
+  let denom = dot(ba, ba);
+  if (denom < 1e-6) { return length(pa) - r; }
+  let h = clamp(dot(pa, ba) / denom, 0.0, 1.0);
+  return length(pa - ba * h) - r;
+}")
+
+    (def cylinder "fn sdCylinder(p: vec3<f32>, r: f32, h: f32) -> f32 {
+  let d = vec2<f32>(length(p.xz) - r, abs(p.y) - h);
+  return length(max(d, vec2<f32>(0.0))) + min(max(d.x, d.y), 0.0);
+}")
+
+    (def plane
+      "fn sdPlane(p: vec3<f32>, n: vec3<f32>, h: f32) -> f32 { return dot(p, n) + h; }")
+
+    (def smooth-union "fn smin(a: f32, b: f32, k: f32) -> f32 {
+  let h = clamp(0.5 + 0.5 * (b - a) / k, 0.0, 1.0);
+  return mix(b, a, h) - k * h * (1.0 - h);
+}")
+
+    (def smooth-subtract "fn ssub(a: f32, b: f32, k: f32) -> f32 {
+  let h = clamp(0.5 - 0.5 * (b + a) / k, 0.0, 1.0);
+  return mix(b, -a, h) + k * h * (1.0 - h);
+}")
+
+    (def smooth-intersect "fn sint(a: f32, b: f32, k: f32) -> f32 {
+  let h = clamp(0.5 - 0.5 * (b - a) / k, 0.0, 1.0);
+  return mix(b, a, h) + k * h * (1.0 - h);
+}")
+
+    (def rotate-x "fn rotateX(p: vec3<f32>, a: f32) -> vec3<f32> {
+  let c = cos(a); let s = sin(a);
+  return vec3<f32>(p.x, c * p.y - s * p.z, s * p.y + c * p.z);
+}")
+
+    (def rotate-y "fn rotateY(p: vec3<f32>, a: f32) -> vec3<f32> {
+  let c = cos(a); let s = sin(a);
+  return vec3<f32>(c * p.x + s * p.z, p.y, c * p.z - s * p.x);
+}")
+
+    (def rotate-z "fn rotateZ(p: vec3<f32>, a: f32) -> vec3<f32> {
+  let c = cos(a); let s = sin(a);
+  return vec3<f32>(c * p.x - s * p.y, s * p.x + c * p.y, p.z);
+}")
+
+    (def repeat "fn repeat(p: vec3<f32>, c: vec3<f32>) -> vec3<f32> {
+  var q = p;
+  if (c.x > 1e-6) { q.x = p.x - c.x * floor(p.x / c.x + 0.5); }
+  if (c.y > 1e-6) { q.y = p.y - c.y * floor(p.y / c.y + 0.5); }
+  if (c.z > 1e-6) { q.z = p.z - c.z * floor(p.z / c.z + 0.5); }
+  return q;
+}")))

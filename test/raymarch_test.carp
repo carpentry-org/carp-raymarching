@@ -1,0 +1,60 @@
+(load "Test.carp")
+(use Test)
+(load "raymarch.carp")
+(use Raymarch)
+(use Vector3)
+
+(defn sphere-sdf [p] (- (Vector3.mag p) 1.0))
+
+(deftest raymarch-test
+  (let [state (Test.State.init 0 0)]
+    (do
+      ;; Basic Hit Test
+      (let [ray (Ray.make (Vector3.init 0.0 0.0 5.0) (Vector3.init 0.0 0.0 -1.0))
+            config (Raymarch.default-config)
+            hit (Raymarch.march &sphere-sdf &ray &config)]
+        (do
+          (set! state
+                (assert-true &state
+                  @(RaymarchHit.hit &hit)
+                  "Ray hits the sphere"))
+          (set! state
+                (assert-true &state
+                  (Double.approx @(RaymarchHit.t &hit) 4.0)
+                  "Distance traveled is ~4.0"))
+          (set! state
+                (assert-true &state
+                  (Double.approx @(Vector3.z (RaymarchHit.p &hit)) 1.0)
+                  "Hit position Z is ~1.0"))))
+
+      ;; Basic Miss Test
+      (let [ray (Ray.make (Vector3.init 0.0 5.0 5.0) (Vector3.init 0.0 0.0 -1.0))
+            config (Raymarch.default-config)
+            hit (Raymarch.march &sphere-sdf &ray &config)]
+        (set! state
+              (assert-false &state
+                @(RaymarchHit.hit &hit)
+                "Ray misses the sphere")))
+
+      ;; Normal Estimation Test
+      (let [px (Vector3.init 1.0 0.0 0.0)
+            nx (Raymarch.estimate-normal &sphere-sdf &px 0.001)
+            py (Vector3.init 0.0 1.0 0.0)
+            ny (Raymarch.estimate-normal &sphere-sdf &py 0.001)
+            pz (Vector3.init 0.0 0.0 1.0)
+            nz (Raymarch.estimate-normal &sphere-sdf &pz 0.001)]
+        (do
+          (set! state
+                (assert-true &state
+                  (Double.approx @(Vector3.x &nx) 1.0)
+                  "Normal at (1,0,0) is (1,0,0)"))
+          (set! state
+                (assert-true &state
+                  (Double.approx @(Vector3.y &ny) 1.0)
+                  "Normal at (0,1,0) is (0,1,0)"))
+          (set! state
+                (assert-true &state
+                  (Double.approx @(Vector3.z &nz) 1.0)
+                  "Normal at (0,0,1) is (0,0,1)"))))
+
+      state)))

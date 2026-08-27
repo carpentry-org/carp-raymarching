@@ -1,0 +1,98 @@
+(load "Test.carp")
+(use Test)
+(load "material.carp")
+(load "shading.carp")
+(load "visibility.carp")
+
+(use Material)
+(use Shading)
+(use Visibility)
+(use Vector3)
+
+(deftest render-test
+  (let [state (Test.State.init 0 0)
+        mat-def (Material.default)
+        light-dir (Vector3.init 0.0 1.0 0.0)
+        normal (Vector3.init 0.0 1.0 0.0)
+        albedo (Vector3.init 1.0 1.0 1.0)]
+    (do
+      ;; 1. Material tests
+      (set! state
+            (assert-equal &state
+              0.5
+              @(Vector3.x (Material.albedo &mat-def))
+              "Default albedo X is 0.5"))
+      (set! state
+            (assert-equal &state
+              0.5
+              @(Vector3.y (Material.albedo &mat-def))
+              "Default albedo Y is 0.5"))
+      (set! state
+            (assert-equal &state
+              0.5
+              @(Vector3.z (Material.albedo &mat-def))
+              "Default albedo Z is 0.5"))
+      (set! state
+            (assert-equal &state
+              0.5
+              @(Material.roughness &mat-def)
+              "Default roughness is 0.5"))
+
+      ;; 2. Shading tests
+      (let [diffuse (Shading.lambert &normal &light-dir &albedo)]
+        (do
+          (set! state
+                (assert-equal &state
+                  1.0
+                  @(Vector3.x &diffuse)
+                  "Lambert diffuse X is 1.0"))
+          (set! state
+                (assert-equal &state
+                  1.0
+                  @(Vector3.y &diffuse)
+                  "Lambert diffuse Y is 1.0"))
+          (set! state
+                (assert-equal &state
+                  1.0
+                  @(Vector3.z &diffuse)
+                  "Lambert diffuse Z is 1.0"))))
+
+      (let [bp (Shading.blinn-phong &normal &light-dir &normal &albedo 0.5 0.0)]
+        ;; Since view-dir = normal and light-dir = normal, half-vector = normal.
+        ;; N.H = 1.0. Specular = 1.0. Diffuse = 1.0.
+        ;; Total = diffuse + specular = (1.0, 1.0, 1.0) + (1.0, 1.0, 1.0) = (2.0, 2.0, 2.0)
+        (do
+          (set! state
+                (assert-equal &state 2.0 @(Vector3.x &bp) "Blinn-Phong X is 2.0"))
+          (set! state
+                (assert-equal &state 2.0 @(Vector3.y &bp) "Blinn-Phong Y is 2.0"))
+          (set! state
+                (assert-equal &state 2.0 @(Vector3.z &bp) "Blinn-Phong Z is 2.0"))))
+
+      (let [c-fog (Shading.apply-fog &(Vector3.init 1.0 1.0 1.0)
+                                     &(Vector3.init 0.0 0.0 0.0)
+                                     10.0
+                                     0.1)]
+        ;; dist = 10, density = 0.1. exponent = -1.0. exp(-1) = 0.36787944.
+        ;; amount = 1 - 0.36787944 = 0.63212056.
+        ;; vlerp from (1,1,1) to (0,0,0) by 0.63212056 = (1 - 0.632) = ~0.368
+        (set! state
+              (assert-true &state
+                (< @(Vector3.x &c-fog) 0.37)
+                "Fog attenuates X correctly")))
+
+      ;; 3. Visibility config test
+      (let [vcfg (Visibility.default-config)]
+        (do
+          (set! state
+                (assert-equal &state
+                  16.0
+                  @(VisibilityConfig.shadow-k &vcfg)
+                  "Default shadow-k is 16.0"))
+          (set! state
+                (assert-equal &state
+                  32
+                  @(VisibilityConfig.shadow-steps &vcfg)
+                  "Default shadow-steps is 32"))))
+
+      state)))

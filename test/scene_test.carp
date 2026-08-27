@@ -1,0 +1,92 @@
+(load "Test.carp")
+(use Test)
+(load "scene.carp")
+
+(use Scene)
+(use SceneObject)
+(use SceneHit)
+(use Vector3)
+(use Material)
+
+(defn sphere1-sdf [p] (- (Vector3.mag p) 1.0))
+
+(defn sphere2-sdf [p]
+  (- (Vector3.mag &(Vector3.sub p &(Vector3.init 3.0 0.0 0.0))) 1.0))
+
+(deftest scene-test
+  (let [state (Test.State.init 0 0)
+        obj1 (SceneObject.init sphere1-sdf 1)
+        obj2 (SceneObject.init sphere2-sdf 2)
+        objects [obj1 obj2]
+        materials [(Material.default)
+                   (Material.make (Vector3.init 1.0 0.0 0.0) 0.1 0.0 0.0)]]
+    (do
+      ;; Point at (0,0,0) is inside sphere 1 (sdf = -1.0) and far from sphere 2 (sdf = 2.0)
+      (let [hit (Scene.min-hit &objects &(Vector3.init 0.0 0.0 0.0))]
+        (do
+          (set! state
+                (assert-equal &state
+                  -1.0
+                  @(SceneHit.distance &hit)
+                  "Hit distance at origin is -1.0"))
+          (set! state
+                (assert-equal &state
+                  1
+                  @(SceneHit.material-id &hit)
+                  "Hit material ID at origin is 1"))))
+
+      ;; Point at (3,0,0) is inside sphere 2 (sdf = -1.0) and far from sphere 1 (sdf = 2.0)
+      (let [hit (Scene.min-hit &objects &(Vector3.init 3.0 0.0 0.0))]
+        (do
+          (set! state
+                (assert-equal &state
+                  -1.0
+                  @(SceneHit.distance &hit)
+                  "Hit distance at (3,0,0) is -1.0"))
+          (set! state
+                (assert-equal &state
+                  2
+                  @(SceneHit.material-id &hit)
+                  "Hit material ID at (3,0,0) is 2"))))
+
+      ;; Point at (1.5,0,0) is exactly halfway. Sphere 1: 0.5. Sphere 2: 0.5.
+      (let [hit (Scene.min-hit &objects &(Vector3.init 1.5 0.0 0.0))]
+        (do
+          (set! state
+                (assert-equal &state
+                  0.5
+                  @(SceneHit.distance &hit)
+                  "Hit distance at (1.5,0,0) is 0.5"))
+          (set! state
+                (assert-equal &state
+                  0.5
+                  (Scene.sdf &objects &(Vector3.init 1.5 0.0 0.0))
+                  "Scene.sdf wrapper works"))
+          (set! state
+                (assert-equal &state
+                  1
+                  (Scene.id &objects &(Vector3.init 1.5 0.0 0.0))
+                  "Scene.id wrapper works (first found)"))))
+
+      ;; Material sampling tests
+      (let [m-def (Scene.sample-material &materials 0)
+            m-custom (Scene.sample-material &materials 1)
+            m-oob (Scene.sample-material &materials 10)]
+        (do
+          (set! state
+                (assert-equal &state
+                  0.5
+                  @(Vector3.x (Material.albedo &m-def))
+                  "Index 0 is default material"))
+          (set! state
+                (assert-equal &state
+                  1.0
+                  @(Vector3.x (Material.albedo &m-custom))
+                  "Index 1 is custom red material"))
+          (set! state
+                (assert-equal &state
+                  0.5
+                  @(Vector3.x (Material.albedo &m-oob))
+                  "Out of bounds samples default material"))))
+
+      state)))

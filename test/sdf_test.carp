@@ -1,0 +1,166 @@
+(load "Test.carp")
+(use Test)
+(load "sdf.carp")
+(use Sdf)
+(use Vector3)
+
+(deftest sdf-test
+  (let [state (Test.State.init 0 0)]
+    (do
+      ;; Sphere Test
+      (let [p0 (Vector3.init 0.0 0.0 0.0)
+            p1 (Vector3.init 1.0 0.0 0.0)
+            p2 (Vector3.init 2.0 0.0 0.0)
+            r 1.0]
+        (do
+          (set! state
+                (assert-equal &state
+                  -1.0
+                  (Sdf.sphere &p0 r)
+                  "Sphere center is -r"))
+          (set! state
+                (assert-equal &state
+                  0.0
+                  (Sdf.sphere &p1 r)
+                  "Sphere surface is 0.0"))
+          (set! state
+                (assert-equal &state
+                  1.0
+                  (Sdf.sphere &p2 r)
+                  "Sphere outside is positive"))))
+
+      ;; Box Test (1x1x1 half-extents)
+      (let [b (Vector3.init 1.0 1.0 1.0)
+            p0 (Vector3.init 0.0 0.0 0.0)
+            p1 (Vector3.init 1.0 0.0 0.0)
+            p2 (Vector3.init 1.0 1.0 1.0)
+            p3 (Vector3.init 2.0 0.0 0.0)]
+        (do
+          (set! state
+                (assert-equal &state -1.0 (Sdf.box &p0 &b) "Box center is -1.0"))
+          (set! state
+                (assert-equal &state 0.0 (Sdf.box &p1 &b) "Box face is 0.0"))
+          (set! state
+                (assert-equal &state 0.0 (Sdf.box &p2 &b) "Box corner is 0.0"))
+          (set! state
+                (assert-equal &state
+                  1.0
+                  (Sdf.box &p3 &b)
+                  "Box outside is positive"))))
+
+      ;; Plane Test (Horizontal plane at y=5)
+      (let [n (Vector3.init 0.0 1.0 0.0)
+            h -5.0
+            p0 (Vector3.init 0.0 5.0 0.0)
+            p1 (Vector3.init 0.0 6.0 0.0)
+            p2 (Vector3.init 0.0 4.0 0.0)]
+        (do
+          (set! state
+                (assert-equal &state
+                  0.0
+                  (Sdf.plane &p0 &n h)
+                  "Point on plane is 0.0"))
+          (set! state
+                (assert-equal &state
+                  1.0
+                  (Sdf.plane &p1 &n h)
+                  "Point above plane is 1.0"))
+          (set! state
+                (assert-equal &state
+                  -1.0
+                  (Sdf.plane &p2 &n h)
+                  "Point below plane is -1.0"))))
+
+      ;; Capsule Test
+      (let [a (Vector3.init 0.0 0.0 0.0)
+            b (Vector3.init 0.0 10.0 0.0)
+            r 1.0
+            p0 (Vector3.init 0.0 5.0 0.0)
+            ;; Middle
+            p1 (Vector3.init 0.0 -1.0 0.0)
+            ;; Bottom tip
+            p2 (Vector3.init 2.0 5.0 0.0)]
+        ;; Outside side
+        (do
+          (set! state
+                (assert-equal &state
+                  -1.0
+                  (Sdf.capsule &p0 &a &b r)
+                  "Capsule axis is -1.0"))
+          (set! state
+                (assert-equal &state
+                  0.0
+                  (Sdf.capsule &p1 &a &b r)
+                  "Capsule bottom tip is 0.0"))
+          (set! state
+                (assert-equal &state
+                  1.0
+                  (Sdf.capsule &p2 &a &b r)
+                  "Capsule outside is 1.0"))))
+
+      ;; Degenerate Capsule Test (a == b)
+      (let [a (Vector3.init 0.0 0.0 0.0)
+            b (Vector3.init 0.0 0.0 0.0)
+            r 1.0
+            p0 (Vector3.init 0.0 0.0 0.0)
+            p1 (Vector3.init 2.0 0.0 0.0)]
+        (do
+          (set! state
+                (assert-equal &state
+                  -1.0
+                  (Sdf.capsule &p0 &a &b r)
+                  "Degenerate capsule center is -1.0"))
+          (set! state
+                (assert-equal &state
+                  1.0
+                  (Sdf.capsule &p1 &a &b r)
+                  "Degenerate capsule outside is 1.0"))))
+
+      ;; Transformation Tests
+      (let [p (Vector3.init 5.0 0.0 0.0)
+            t (Vector3.init 2.0 0.0 0.0)
+            res (Sdf.translate &p &t)]
+        (set! state
+              (assert-true &state
+                (Double.approx @(Vector3.x &res) 3.0)
+                "Translate works")))
+
+      (let [p (Vector3.init 1.0 0.0 0.0)
+            angle (* 90.0 0.017453292499999998)
+            res (Sdf.rotate-y &p angle)]
+        (do
+          (set! state
+                (assert-true &state
+                  (Double.approx @(Vector3.x &res) 0.0)
+                  "RotateY X -> 0"))
+          (set! state
+                (assert-true &state
+                  (Double.approx @(Vector3.z &res) -1.0)
+                  "RotateY Z -> -1"))))
+
+      (let [p (Vector3.init 2.0 0.0 0.0)
+            res (Sdf.scale-space &p 2.0)]
+        (set! state
+              (assert-true &state
+                (Double.approx @(Vector3.x &res) 1.0)
+                "Scale-space works (coordinate transform)")))
+
+      ;; Smooth Operation Tests (Numerical Expectations)
+      (let [d1 1.0
+            d2 1.0
+            k 1.0]
+        (set! state
+              (assert-true &state
+                (Double.approx (Sdf.smooth-union d1 d2 k) 0.75)
+                "Smooth union (1,1,1) is 0.75")))
+
+      (let [d1 1.0
+            d2 1.0
+            k 0.0]
+        (set! state
+              (assert-equal &state
+                1.0
+                (Sdf.smooth-union d1 d2 k)
+                "Smooth union k=0 falls back to union")))
+
+      state)))

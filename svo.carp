@@ -1,0 +1,349 @@
+;; carp-svo/svo.carp
+;; A generic 3D Sparse Voxel Octree (SVO) spatial index using flat node pooling.
+
+(load "Vector.carp")
+
+(deftype SvoNode
+  [child-ptr Uint32
+   ;; child pointer (NO-CHILD if leaf)
+   data-index Int
+   ;; external payload index / data handle
+   flags Uint32
+   ;; dynamic node flags
+  ])
+
+(deftype Svo
+  [nodes (Array SvoNode)
+   max-depth Int
+   origin (Vector3 Double)
+   size Double
+   default-idx Int])
+
+(defmodule SvoNode
+  (def NO-CHILD (Uint32.from-long -1l))
+
+  (defn init-default [data-idx]
+    (SvoNode.init NO-CHILD data-idx (Uint32.from-long 0l)))
+
+  (defn leaf? [node] (= @(SvoNode.child-ptr node) NO-CHILD)))
+
+(defmodule Svo
+  (use Vector3)
+
+  (sig new (Fn [(Vector3 Double) Double Int Int] Svo))
+  (sig clear! (Fn [(Ref Svo)] ()))
+  (sig subdivide! (Fn [(Ref Svo) Int] Int))
+  (sig insert! (Fn [(Ref Svo) (Ref (Vector3 Double)) Int] ()))
+  (sig sample (Fn [(Ref Svo) (Ref (Vector3 Double))] Int))
+
+  (sig prune! (Fn [(Ref Svo)] ()))
+  (sig prune-node! (Fn [(Ref Svo) Int] (Maybe Int)))
+
+  (sig query-aabb!
+       (Fn
+         [(Ref Svo)
+          (Ref (Vector3 Double))
+          (Ref (Vector3 Double))
+          (Ref (Array Int))]
+         ()))
+  (sig query-aabb-node!
+       (Fn
+         [(Ref Svo)
+          Int
+          (Ref (Vector3 Double))
+          (Ref (Vector3 Double))
+          (Vector3 Double)
+          Double
+          (Ref (Array Int))]
+         ()))
+
+  (sig query-sphere!
+       (Fn [(Ref Svo) (Ref (Vector3 Double)) Double (Ref (Array Int))] ()))
+  (sig query-sphere-node!
+       (Fn
+         [(Ref Svo)
+          Int
+          (Ref (Vector3 Double))
+          (Ref Double)
+          (Vector3 Double)
+          Double
+          (Ref (Array Int))]
+         ()))
+
+  (defn clamp-double [val min-val max-val]
+    (if (< val min-val) min-val (if (> val max-val) max-val val)))
+
+  (defn new [origin size max-depth default-idx]
+    (let [root-node (SvoNode.init-default default-idx)
+          nodes [root-node]]
+      (Svo.init nodes max-depth origin size default-idx)))
+
+  (defn clear! [svo]
+    (let [nodes (Svo.nodes svo)
+          default-idx @(Svo.default-idx svo)]
+      (do
+        (while (> (Array.length nodes) 0)
+          (let [discarded-node (Array.pop-back! nodes)] ()))
+        (Array.push-back! nodes (SvoNode.init-default default-idx)))))
+
+  (defn subdivide! [svo node-idx]
+    (let [nodes (Svo.nodes svo)
+          parent (Array.unsafe-nth nodes node-idx)
+          parent-idx @(SvoNode.data-index parent)
+          child-start-idx (Array.length nodes)
+          child-start-u32 (Uint32.from-long (Long.from-int child-start-idx))]
+      (do
+        (for [i 0 8] (Array.push-back! nodes (SvoNode.init-default parent-idx)))
+        (let [p-ref (Array.unsafe-nth nodes node-idx)]
+          (SvoNode.set-child-ptr! p-ref child-start-u32))
+        child-start-idx)))
+
+  (defn insert! [svo pos-ref val]
+    (let [nodes (Svo.nodes svo)
+          max-d @(Svo.max-depth svo)
+          root-ox @(Vector3.x (Svo.origin svo))
+          root-oy @(Vector3.y (Svo.origin svo))
+          root-oz @(Vector3.z (Svo.origin svo))
+          root-sz @(Svo.size svo)
+          px @(Vector3.x pos-ref)
+          py @(Vector3.y pos-ref)
+          pz @(Vector3.z pos-ref)]
+      (when (and
+          (and (>= px root-ox) (< px (+ root-ox root-sz)))
+          (and
+            (and (>= py root-oy) (< py (+ root-oy root-sz)))
+            (and (>= pz root-oz) (< pz (+ root-oz root-sz)))))
+        (let [curr-node-idx 0
+              ox root-ox
+              oy root-oy
+              oz root-oz
+              sz root-sz]
+          (do
+            (for [depth 0 max-d]
+              (let [hs (* sz 0.5)
+                    cx (+ ox hs)
+                    cy (+ oy hs)
+                    cz (+ oz hs)
+                    oct-x (if (>= px cx) 1 0)
+                    oct-y (if (>= py cy) 1 0)
+                    oct-z (if (>= pz cz) 1 0)
+                    oct-idx (+ oct-x (+ (* oct-y 2) (* oct-z 4)))
+                    curr-node (Array.unsafe-nth nodes curr-node-idx)
+                    child-ptr @(SvoNode.child-ptr curr-node)]
+                (let [next-child-block-idx (if (= child-ptr SvoNode.NO-CHILD)
+                        (subdivide! svo curr-node-idx)
+                        (Long.to-int (Uint32.to-long child-ptr)))]
+                  (do
+                    (set! curr-node-idx (+ next-child-block-idx oct-idx))
+                    (set! ox (+ ox (* (Double.from-int oct-x) hs)))
+                    (set! oy (+ oy (* (Double.from-int oct-y) hs)))
+                    (set! oz (+ oz (* (Double.from-int oct-z) hs)))
+                    (set! sz hs)))))
+            (let [leaf-node (Array.unsafe-nth nodes curr-node-idx)]
+              (SvoNode.set-data-index! leaf-node val)))))))
+
+  (defn sample [svo pos-ref]
+    (let [nodes (Svo.nodes svo)
+          max-d @(Svo.max-depth svo)
+          root-ox @(Vector3.x (Svo.origin svo))
+          root-oy @(Vector3.y (Svo.origin svo))
+          root-oz @(Vector3.z (Svo.origin svo))
+          root-sz @(Svo.size svo)
+          px @(Vector3.x pos-ref)
+          py @(Vector3.y pos-ref)
+          pz @(Vector3.z pos-ref)
+          def-idx @(Svo.default-idx svo)]
+      (if (and
+          (and (>= px root-ox) (< px (+ root-ox root-sz)))
+          (and
+            (and (>= py root-oy) (< py (+ root-oy root-sz)))
+            (and (>= pz root-oz) (< pz (+ root-oz root-sz)))))
+        (let [curr-node-idx 0
+              ox root-ox
+              oy root-oy
+              oz root-oz
+              sz root-sz
+              val def-idx
+              found false
+              depth 0]
+          (do
+            (while (and (not found) (< depth max-d))
+              (let [curr-node (Array.unsafe-nth nodes curr-node-idx)
+                    child-ptr @(SvoNode.child-ptr curr-node)]
+                (if (= child-ptr SvoNode.NO-CHILD)
+                  (do
+                    (set! val @(SvoNode.data-index curr-node))
+                    (set! found true))
+                  (let [hs (* sz 0.5)
+                        cx (+ ox hs)
+                        cy (+ oy hs)
+                        cz (+ oz hs)
+                        oct-x (if (>= px cx) 1 0)
+                        oct-y (if (>= py cy) 1 0)
+                        oct-z (if (>= pz cz) 1 0)
+                        oct-idx (+ oct-x (+ (* oct-y 2) (* oct-z 4)))
+                        child-start-idx (Long.to-int (Uint32.to-long child-ptr))]
+                    (do
+                      (set! curr-node-idx (+ child-start-idx oct-idx))
+                      (set! ox (+ ox (* (Double.from-int oct-x) hs)))
+                      (set! oy (+ oy (* (Double.from-int oct-y) hs)))
+                      (set! oz (+ oz (* (Double.from-int oct-z) hs)))
+                      (set! sz hs)
+                      (set! depth (inc depth)))))))
+            (if found
+              val
+              @(SvoNode.data-index (Array.unsafe-nth nodes curr-node-idx)))))
+        def-idx)))
+
+  (defn prune-node! [svo node-idx]
+    (let [nodes (Svo.nodes svo)
+          node (Array.unsafe-nth nodes node-idx)
+          child-ptr @(SvoNode.child-ptr node)]
+      (if (= child-ptr SvoNode.NO-CHILD)
+        (Maybe.Just @(SvoNode.data-index node))
+        (let [child-start-idx (Long.to-int (Uint32.to-long child-ptr))
+              all-same true
+              first-val (the (Maybe Int) (Maybe.Nothing))
+              can-prune true]
+          (do
+            (for [i 0 8]
+              (let [child-idx (+ child-start-idx i)
+                    res (prune-node! svo child-idx)]
+                (if (Maybe.just? &res)
+                  (let [v (Maybe.unsafe-from res)]
+                    (if (Maybe.nothing? &first-val)
+                      (set! first-val (Maybe.Just v))
+                      (let [fv (Maybe.unsafe-from @&first-val)]
+                        (when (/= fv v) (set! all-same false)))))
+                  (set! can-prune false))))
+            (if (and can-prune all-same)
+              (if (Maybe.just? &first-val)
+                (let [v (Maybe.unsafe-from @&first-val)]
+                  (do
+                    (let [p-ref (Array.unsafe-nth nodes node-idx)]
+                      (do
+                        (SvoNode.set-child-ptr! p-ref SvoNode.NO-CHILD)
+                        (SvoNode.set-data-index! p-ref v)))
+                    (Maybe.Just v)))
+                (Maybe.Nothing))
+              (Maybe.Nothing)))))))
+
+  (defn prune! [svo] (let [_ (prune-node! svo 0)] ()))
+
+  (defn query-aabb-node! [svo
+                          node-idx
+                          aabb-min
+                          aabb-max
+                          node-origin
+                          node-size
+                          results]
+    (let [nodes (Svo.nodes svo)
+          node (Array.unsafe-nth nodes node-idx)
+          ox @(Vector3.x &node-origin)
+          oy @(Vector3.y &node-origin)
+          oz @(Vector3.z &node-origin)
+          sz node-size
+          ;; Check overlap
+          overlap (and
+            (and (<= ox @(Vector3.x aabb-max))
+                 (>= (+ ox sz) @(Vector3.x aabb-min)))
+            (and
+              (and (<= oy @(Vector3.y aabb-max))
+                   (>= (+ oy sz) @(Vector3.y aabb-min)))
+              (and (<= oz @(Vector3.z aabb-max))
+                   (>= (+ oz sz) @(Vector3.z aabb-min)))))]
+      (when overlap
+        (let [child-ptr @(SvoNode.child-ptr node)]
+          (if (= child-ptr SvoNode.NO-CHILD)
+            (let [val @(SvoNode.data-index node)
+                  def-idx @(Svo.default-idx svo)]
+              (when (/= val def-idx) (Array.push-back! results val)))
+            (let [child-start-idx (Long.to-int (Uint32.to-long child-ptr))
+                  hs (* sz 0.5)]
+              (for [oct-z 0 2]
+                (for [oct-y 0 2]
+                  (for [oct-x 0 2]
+                    (let [oct-idx (+ oct-x (+ (* oct-y 2) (* oct-z 4)))
+                          child-idx (+ child-start-idx oct-idx)
+                          child-origin (Vector3.init (+ ox
+                                                        (* (Double.from-int oct-x)
+                                                           hs))
+                                                     (+ oy
+                                                        (* (Double.from-int oct-y)
+                                                           hs))
+                                                     (+ oz
+                                                        (* (Double.from-int oct-z)
+                                                           hs)))]
+                      (query-aabb-node! svo
+                                        child-idx
+                                        aabb-min
+                                        aabb-max
+                                        child-origin
+                                        hs
+                                        results)))))))))))
+
+  (defn query-aabb! [svo aabb-min aabb-max results]
+    (let [origin @(Svo.origin svo)
+          size @(Svo.size svo)]
+      (query-aabb-node! svo 0 aabb-min aabb-max origin size results)))
+
+  (defn query-sphere-node! [svo
+                            node-idx
+                            center
+                            radius
+                            node-origin
+                            node-size
+                            results]
+    (let [nodes (Svo.nodes svo)
+          node (Array.unsafe-nth nodes node-idx)
+          ox @(Vector3.x &node-origin)
+          oy @(Vector3.y &node-origin)
+          oz @(Vector3.z &node-origin)
+          sz node-size
+          ;; Find closest point on box to sphere center
+          cx @(Vector3.x center)
+          cy @(Vector3.y center)
+          cz @(Vector3.z center)
+          px (clamp-double cx ox (+ ox sz))
+          py (clamp-double cy oy (+ oy sz))
+          pz (clamp-double cz oz (+ oz sz))
+          ;; Distance from closest point to sphere center
+          dx (- cx px)
+          dy (- cy py)
+          dz (- cz pz)
+          dist-sq (+ (* dx dx) (+ (* dy dy) (* dz dz)))
+          overlap (< dist-sq (* @radius @radius))]
+      (when overlap
+        (let [child-ptr @(SvoNode.child-ptr node)]
+          (if (= child-ptr SvoNode.NO-CHILD)
+            (let [val @(SvoNode.data-index node)
+                  def-idx @(Svo.default-idx svo)]
+              (when (/= val def-idx) (Array.push-back! results val)))
+            (let [child-start-idx (Long.to-int (Uint32.to-long child-ptr))
+                  hs (* sz 0.5)]
+              (for [oct-z 0 2]
+                (for [oct-y 0 2]
+                  (for [oct-x 0 2]
+                    (let [oct-idx (+ oct-x (+ (* oct-y 2) (* oct-z 4)))
+                          child-idx (+ child-start-idx oct-idx)
+                          child-origin (Vector3.init (+ ox
+                                                        (* (Double.from-int oct-x)
+                                                           hs))
+                                                     (+ oy
+                                                        (* (Double.from-int oct-y)
+                                                           hs))
+                                                     (+ oz
+                                                        (* (Double.from-int oct-z)
+                                                           hs)))]
+                      (query-sphere-node! svo
+                                          child-idx
+                                          center
+                                          radius
+                                          child-origin
+                                          hs
+                                          results)))))))))))
+
+  (defn query-sphere! [svo center radius results]
+    (let [origin @(Svo.origin svo)
+          size @(Svo.size svo)]
+      (query-sphere-node! svo 0 center &radius origin size results))))

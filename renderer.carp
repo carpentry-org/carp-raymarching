@@ -1,0 +1,40 @@
+(load "raymarch.carp")
+(load "visibility.carp")
+(load "shading.carp")
+(load "material.carp")
+(load "scene.carp")
+
+(doc RenderConfig "unifies parameters across the entire modular stack.")
+(deftype RenderConfig [march RaymarchConfig
+                       visibility VisibilityConfig])
+
+(defmodule Renderer
+  (doc default-config
+    "returns a balanced configuration for the entire pipeline.")
+  (defn default-config []
+    (RenderConfig.init (Raymarch.default-config) (Visibility.default-config)))
+
+  (doc shade-hit
+    "performs a single shading pass for a given surface point, material, and light.")
+  (defn shade-hit [sdf-fn ray p n mat light config]
+    (let [m-config (RenderConfig.march config)
+          v-config (RenderConfig.visibility config)
+          ;; Light Setup
+          light-pos (Light.pos light)
+          light-color (Light.color light)
+          light-dir (Vector3.normalize &(Vector3.sub light-pos p))
+          light-ray (Ray.make
+            (Vector3.add p &(Vector3.mul &light-dir 0.01))
+            @&light-dir)
+          shadow (Visibility.shadow sdf-fn &light-ray v-config m-config)
+          ao (Visibility.ambient-occlusion sdf-fn &(Ray.make @p @n) v-config)
+          view-dir (Vector3.neg (Ray.direction ray))
+          base-color (Shading.blinn-phong n
+                                          &light-dir
+                                          &view-dir
+                                          (Material.albedo mat)
+                                          @(Material.roughness mat)
+                                          @(Material.metallic mat))
+          final-surface (Shading.apply-occlusion &base-color shadow ao)
+          lit-surface (Vector3.cmul &final-surface light-color)]
+      (Vector3.add &lit-surface (Material.emission mat)))))
