@@ -73,14 +73,14 @@
                                                        &ray
                                                        p
                                                        n
-                                                       mat
+                                                       &mat
                                                        &light1
                                                        &config)
                                 c2 (Renderer.shade-hit &world-sdf
                                                        &ray
                                                        p
                                                        n
-                                                       mat
+                                                       &mat
                                                        &light2
                                                        &config)]
                             (Vector3.add &c1 &c2))

@@ -38,9 +38,15 @@
               ;; Setup light (Strong sun-like light)
               light (Light.init (Vector3.init 50.0 100.0 50.0)
                                 (Vector3.init 0.9 0.9 1.0))
-              lit-color (Renderer.shade-hit &world-sdf ray p n mat &light config)
+              lit-color (Renderer.shade-hit &world-sdf
+                                            ray
+                                            p
+                                            n
+                                            &mat
+                                            &light
+                                            config)
               ;; Reflection
-              reflect-factor @(Material.reflectivity mat)
+              reflect-factor @(Material.reflectivity &mat)
               final-color (if (> reflect-factor 0.001)
                 (let [reflect-dir (Vector3.normalize
                         &(Vector3.sub (Ray.direction ray)

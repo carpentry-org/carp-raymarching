@@ -34,6 +34,14 @@ jobs:
             carp -x "$t"
           done
 
+      - name: Build examples
+        run: |
+          set -euo pipefail
+          for e in examples/*.carp; do
+            echo "== $e"
+            carp -b "$e"
+          done
+
       - name: Install carp-fmt
         run: |
           set -euo pipefail
