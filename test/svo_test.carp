@@ -1,6 +1,6 @@
 (load "Test.carp")
 (use Test)
-(load "../svo.carp")
+(load "svo.carp")
 (use Svo)
 
 (deftest svo-test

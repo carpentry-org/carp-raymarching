@@ -1,0 +1,59 @@
+(load "carp-raymarching.carp")
+
+(Project.config "title" "carp-raymarching")
+(Project.config "docs-directory" "./docs/")
+(Project.config "docs-logo" "")
+(Project.config "docs-url" "https://github.com/carpentry-org/carp-raymarching")
+(Project.config "docs-styling" "../style.css")
+(Project.config "docs-prelude" "A signed-distance-field raymarcher for Carp.
+
+```
+(load \"git@github.com:carpentry-org/carp-raymarching@master\")
+```
+
+### Distance fields
+- [`Sdf`](./Sdf.html) — primitives and the CSG operators that combine them
+- [`Svo`](./Svo.html) — sparse voxel octree, with [`SvoNode`](./SvoNode.html)
+
+### Marching
+- [`Ray`](./Ray.html) — origin and direction
+- [`Raymarch`](./Raymarch.html) — the march itself, returning a
+  [`RaymarchHit`](./RaymarchHit.html), tuned by
+  [`RaymarchConfig`](./RaymarchConfig.html)
+- [`Visibility`](./Visibility.html) — shadows and ambient occlusion, tuned by
+  [`VisibilityConfig`](./VisibilityConfig.html)
+
+### Shading
+- [`Material`](./Material.html) — albedo, roughness, metallic, emission
+- [`Shading`](./Shading.html) — blinn-phong and occlusion, lit by
+  [`Light`](./Light.html)
+- [`Scene`](./Scene.html) — world composition, with
+  [`SceneObject`](./SceneObject.html) and [`SceneHit`](./SceneHit.html)
+- [`Renderer`](./Renderer.html) — the pipeline config
+  ([`RenderConfig`](./RenderConfig.html)) and a shading pass over one hit
+
+The `examples/` directory has runnable CPU renderers that write PPM files, one
+of them parallel over
+[carp-job-system](https://github.com/carpentry-org/carp-job-system).")
+
+(save-docs Sdf
+           Svo
+           SvoNode
+           Ray
+           Raymarch
+           RaymarchHit
+           RaymarchConfig
+           Visibility
+           VisibilityConfig
+           Material
+           Shading
+           Light
+           Scene
+           SceneObject
+           SceneHit
+           Renderer
+           RenderConfig)
+; Carp's save-docs hardcodes the index filename as <title>_index.html.
+; Rename to docs/index.html.
+(defn main []
+  (System.system "mv ./docs/carp-raymarching_index.html ./docs/index.html"))

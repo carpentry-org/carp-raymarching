@@ -1,0 +1,232 @@
+<!DOCTYPE HTML>
+
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+        <link rel="stylesheet" href="../style.css">
+    </head>
+    <body>
+        <div class="content">
+            <div class="logo">
+                <a href="https://github.com/carpentry-org/carp-raymarching">
+                    <img src="">
+                </a>
+                <div class="title">
+                    carp-raymarching
+                </div>
+                <div class="index">
+                    <ul>
+                        <li>
+                            <details>
+                                <summary>
+                                    <a href="Sdf.html">
+                                        Sdf
+                                    </a>
+                                </summary>
+                                <ul>
+                                    <li>
+                                        <a href="Sdf.Wgsl.html">
+                                            Wgsl
+                                        </a>
+                                    </li>
+                                </ul>
+                            </details>
+                        </li>
+                        <li>
+                            <a href="Svo.html">
+                                Svo
+                            </a>
+                        </li>
+                        <li>
+                            <a href="SvoNode.html">
+                                SvoNode
+                            </a>
+                        </li>
+                        <li>
+                            <a href="Ray.html">
+                                Ray
+                            </a>
+                        </li>
+                        <li>
+                            <details>
+                                <summary>
+                                    <a href="Raymarch.html">
+                                        Raymarch
+                                    </a>
+                                </summary>
+                                <ul>
+                                    <li>
+                                        <a href="Raymarch.Wgsl.html">
+                                            Wgsl
+                                        </a>
+                                    </li>
+                                </ul>
+                            </details>
+                        </li>
+                        <li>
+                            <a href="RaymarchHit.html">
+                                RaymarchHit
+                            </a>
+                        </li>
+                        <li>
+                            <a href="RaymarchConfig.html">
+                                RaymarchConfig
+                            </a>
+                        </li>
+                        <li>
+                            <details>
+                                <summary>
+                                    <a href="Visibility.html">
+                                        Visibility
+                                    </a>
+                                </summary>
+                                <ul>
+                                    <li>
+                                        <a href="Visibility.Wgsl.html">
+                                            Wgsl
+                                        </a>
+                                    </li>
+                                </ul>
+                            </details>
+                        </li>
+                        <li>
+                            <a href="VisibilityConfig.html">
+                                VisibilityConfig
+                            </a>
+                        </li>
+                        <li>
+                            <a href="Material.html">
+                                Material
+                            </a>
+                        </li>
+                        <li>
+                            <a href="Shading.html">
+                                Shading
+                            </a>
+                        </li>
+                        <li>
+                            <a href="Light.html">
+                                Light
+                            </a>
+                        </li>
+                        <li>
+                            <a href="Scene.html">
+                                Scene
+                            </a>
+                        </li>
+                        <li>
+                            <a href="SceneObject.html">
+                                SceneObject
+                            </a>
+                        </li>
+                        <li>
+                            <a href="SceneHit.html">
+                                SceneHit
+                            </a>
+                        </li>
+                        <li>
+                            <a href="Renderer.html">
+                                Renderer
+                            </a>
+                        </li>
+                        <li>
+                            <a href="RenderConfig.html">
+                                RenderConfig
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="module">
+                <h1>
+                    Shading
+                </h1>
+                <div class="module-description">
+                    <p>provides pure equations for surface lighting.</p>
+
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#apply-fog">
+                        <h3 id="apply-fog">
+                            apply-fog
+                        </h3>
+                    </a>
+                    <div class="description">
+                        defn
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref (Vector3 Double) a), (Ref (Vector3 Double) b), Double, Double] (Vector3 Double))
+                    </p>
+                    <pre class="args">
+                        (apply-fog color fog-color dist density)
+                    </pre>
+                    <p class="doc">
+                        <p>blends a color with a background/fog color based on distance.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#apply-occlusion">
+                        <h3 id="apply-occlusion">
+                            apply-occlusion
+                        </h3>
+                    </a>
+                    <div class="description">
+                        defn
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref (Vector3 a) b), a, a] (Vector3 a))
+                    </p>
+                    <pre class="args">
+                        (apply-occlusion color shadow ao)
+                    </pre>
+                    <p class="doc">
+                        <p>modulates a color by shadow and AO factors.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#blinn-phong">
+                        <h3 id="blinn-phong">
+                            blinn-phong
+                        </h3>
+                    </a>
+                    <div class="description">
+                        defn
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref (Vector3 Double) a), (Ref (Vector3 Double) b), (Ref (Vector3 Double) c), (Ref (Vector3 Double) d), Double, e] (Vector3 Double))
+                    </p>
+                    <pre class="args">
+                        (blinn-phong normal light-dir view-dir albedo roughness metallic)
+                    </pre>
+                    <p class="doc">
+                        <p>calculates diffuse and specular reflection.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#lambert">
+                        <h3 id="lambert">
+                            lambert
+                        </h3>
+                    </a>
+                    <div class="description">
+                        defn
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref (Vector3 Double) a), (Ref (Vector3 Double) b), (Ref (Vector3 Double) c)] (Vector3 Double))
+                    </p>
+                    <pre class="args">
+                        (lambert normal light-dir albedo)
+                    </pre>
+                    <p class="doc">
+                        <p>calculates basic diffuse reflection.</p>
+
+                    </p>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

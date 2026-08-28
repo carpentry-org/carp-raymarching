@@ -1,0 +1,879 @@
+<!DOCTYPE HTML>
+
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+        <link rel="stylesheet" href="../style.css">
+    </head>
+    <body>
+        <div class="content">
+            <div class="logo">
+                <a href="https://github.com/carpentry-org/carp-raymarching">
+                    <img src="">
+                </a>
+                <div class="title">
+                    carp-raymarching
+                </div>
+                <div class="index">
+                    <ul>
+                        <li>
+                            <details>
+                                <summary>
+                                    <a href="Sdf.html">
+                                        Sdf
+                                    </a>
+                                </summary>
+                                <ul>
+                                    <li>
+                                        <a href="Sdf.Wgsl.html">
+                                            Wgsl
+                                        </a>
+                                    </li>
+                                </ul>
+                            </details>
+                        </li>
+                        <li>
+                            <a href="Svo.html">
+                                Svo
+                            </a>
+                        </li>
+                        <li>
+                            <a href="SvoNode.html">
+                                SvoNode
+                            </a>
+                        </li>
+                        <li>
+                            <a href="Ray.html">
+                                Ray
+                            </a>
+                        </li>
+                        <li>
+                            <details>
+                                <summary>
+                                    <a href="Raymarch.html">
+                                        Raymarch
+                                    </a>
+                                </summary>
+                                <ul>
+                                    <li>
+                                        <a href="Raymarch.Wgsl.html">
+                                            Wgsl
+                                        </a>
+                                    </li>
+                                </ul>
+                            </details>
+                        </li>
+                        <li>
+                            <a href="RaymarchHit.html">
+                                RaymarchHit
+                            </a>
+                        </li>
+                        <li>
+                            <a href="RaymarchConfig.html">
+                                RaymarchConfig
+                            </a>
+                        </li>
+                        <li>
+                            <details>
+                                <summary>
+                                    <a href="Visibility.html">
+                                        Visibility
+                                    </a>
+                                </summary>
+                                <ul>
+                                    <li>
+                                        <a href="Visibility.Wgsl.html">
+                                            Wgsl
+                                        </a>
+                                    </li>
+                                </ul>
+                            </details>
+                        </li>
+                        <li>
+                            <a href="VisibilityConfig.html">
+                                VisibilityConfig
+                            </a>
+                        </li>
+                        <li>
+                            <a href="Material.html">
+                                Material
+                            </a>
+                        </li>
+                        <li>
+                            <a href="Shading.html">
+                                Shading
+                            </a>
+                        </li>
+                        <li>
+                            <a href="Light.html">
+                                Light
+                            </a>
+                        </li>
+                        <li>
+                            <a href="Scene.html">
+                                Scene
+                            </a>
+                        </li>
+                        <li>
+                            <a href="SceneObject.html">
+                                SceneObject
+                            </a>
+                        </li>
+                        <li>
+                            <a href="SceneHit.html">
+                                SceneHit
+                            </a>
+                        </li>
+                        <li>
+                            <a href="Renderer.html">
+                                Renderer
+                            </a>
+                        </li>
+                        <li>
+                            <a href="RenderConfig.html">
+                                RenderConfig
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="module">
+                <h1>
+                    Svo
+                </h1>
+                <div class="module-description">
+                    
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#clamp-double">
+                        <h3 id="clamp-double">
+                            clamp-double
+                        </h3>
+                    </a>
+                    <div class="description">
+                        defn
+                    </div>
+                    <p class="sig">
+                        (Fn [a, a, a] a)
+                    </p>
+                    <pre class="args">
+                        (clamp-double val min-val max-val)
+                    </pre>
+                    <p class="doc">
+                        
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#clear!">
+                        <h3 id="clear!">
+                            clear!
+                        </h3>
+                    </a>
+                    <div class="description">
+                        defn
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Svo a)] ())
+                    </p>
+                    <pre class="args">
+                        (clear! svo)
+                    </pre>
+                    <p class="doc">
+                        
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#copy">
+                        <h3 id="copy">
+                            copy
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Svo a)] Svo)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>copies a <code>Svo</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#default-idx">
+                        <h3 id="default-idx">
+                            default-idx
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Svo a)] (Ref Int a))
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>gets the <code>default-idx</code> property of a <code>Svo</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#delete">
+                        <h3 id="delete">
+                            delete
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [Svo] ())
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>deletes a <code>Svo</code>. Should usually not be called manually.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#init">
+                        <h3 id="init">
+                            init
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Array SvoNode), Int, (Vector3 Double), Double, Int] Svo)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>creates a <code>Svo</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#insert!">
+                        <h3 id="insert!">
+                            insert!
+                        </h3>
+                    </a>
+                    <div class="description">
+                        defn
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Svo a), (Ref (Vector3 Double) b), Int] ())
+                    </p>
+                    <pre class="args">
+                        (insert! svo pos-ref val)
+                    </pre>
+                    <p class="doc">
+                        
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#max-depth">
+                        <h3 id="max-depth">
+                            max-depth
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Svo a)] (Ref Int a))
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>gets the <code>max-depth</code> property of a <code>Svo</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#new">
+                        <h3 id="new">
+                            new
+                        </h3>
+                    </a>
+                    <div class="description">
+                        defn
+                    </div>
+                    <p class="sig">
+                        (Fn [(Vector3 Double), Double, Int, Int] Svo)
+                    </p>
+                    <pre class="args">
+                        (new origin size max-depth default-idx)
+                    </pre>
+                    <p class="doc">
+                        
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#nodes">
+                        <h3 id="nodes">
+                            nodes
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Svo a)] (Ref (Array SvoNode) a))
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>gets the <code>nodes</code> property of a <code>Svo</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#origin">
+                        <h3 id="origin">
+                            origin
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Svo a)] (Ref (Vector3 Double) a))
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>gets the <code>origin</code> property of a <code>Svo</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#prn">
+                        <h3 id="prn">
+                            prn
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Svo a)] String)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>converts a <code>Svo</code> to a string.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#prune!">
+                        <h3 id="prune!">
+                            prune!
+                        </h3>
+                    </a>
+                    <div class="description">
+                        defn
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Svo a)] ())
+                    </p>
+                    <pre class="args">
+                        (prune! svo)
+                    </pre>
+                    <p class="doc">
+                        
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#prune-node!">
+                        <h3 id="prune-node!">
+                            prune-node!
+                        </h3>
+                    </a>
+                    <div class="description">
+                        defn
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Svo a), Int] (Maybe Int))
+                    </p>
+                    <pre class="args">
+                        (prune-node! svo node-idx)
+                    </pre>
+                    <p class="doc">
+                        
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#query-aabb!">
+                        <h3 id="query-aabb!">
+                            query-aabb!
+                        </h3>
+                    </a>
+                    <div class="description">
+                        defn
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Svo a), (Ref (Vector3 Double) b), (Ref (Vector3 Double) c), (Ref (Array Int) d)] ())
+                    </p>
+                    <pre class="args">
+                        (query-aabb! svo aabb-min aabb-max results)
+                    </pre>
+                    <p class="doc">
+                        
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#query-aabb-node!">
+                        <h3 id="query-aabb-node!">
+                            query-aabb-node!
+                        </h3>
+                    </a>
+                    <div class="description">
+                        defn
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Svo a), Int, (Ref (Vector3 Double) b), (Ref (Vector3 Double) c), (Vector3 Double), Double, (Ref (Array Int) d)] ())
+                    </p>
+                    <pre class="args">
+                        (query-aabb-node! svo node-idx aabb-min aabb-max node-origin node-size results)
+                    </pre>
+                    <p class="doc">
+                        
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#query-sphere!">
+                        <h3 id="query-sphere!">
+                            query-sphere!
+                        </h3>
+                    </a>
+                    <div class="description">
+                        defn
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Svo a), (Ref (Vector3 Double) b), Double, (Ref (Array Int) c)] ())
+                    </p>
+                    <pre class="args">
+                        (query-sphere! svo center radius results)
+                    </pre>
+                    <p class="doc">
+                        
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#query-sphere-node!">
+                        <h3 id="query-sphere-node!">
+                            query-sphere-node!
+                        </h3>
+                    </a>
+                    <div class="description">
+                        defn
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Svo a), Int, (Ref (Vector3 Double) b), (Ref Double c), (Vector3 Double), Double, (Ref (Array Int) d)] ())
+                    </p>
+                    <pre class="args">
+                        (query-sphere-node! svo node-idx center radius node-origin node-size results)
+                    </pre>
+                    <p class="doc">
+                        
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#sample">
+                        <h3 id="sample">
+                            sample
+                        </h3>
+                    </a>
+                    <div class="description">
+                        defn
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Svo a), (Ref (Vector3 Double) b)] Int)
+                    </p>
+                    <pre class="args">
+                        (sample svo pos-ref)
+                    </pre>
+                    <p class="doc">
+                        
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#set-default-idx">
+                        <h3 id="set-default-idx">
+                            set-default-idx
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [Svo, Int] Svo)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>sets the <code>default-idx</code> property of a <code>Svo</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#set-default-idx!">
+                        <h3 id="set-default-idx!">
+                            set-default-idx!
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Svo a), Int] ())
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>sets the <code>default-idx</code> property of a <code>Svo</code> in place.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#set-max-depth">
+                        <h3 id="set-max-depth">
+                            set-max-depth
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [Svo, Int] Svo)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>sets the <code>max-depth</code> property of a <code>Svo</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#set-max-depth!">
+                        <h3 id="set-max-depth!">
+                            set-max-depth!
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Svo a), Int] ())
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>sets the <code>max-depth</code> property of a <code>Svo</code> in place.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#set-nodes">
+                        <h3 id="set-nodes">
+                            set-nodes
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [Svo, (Array SvoNode)] Svo)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>sets the <code>nodes</code> property of a <code>Svo</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#set-nodes!">
+                        <h3 id="set-nodes!">
+                            set-nodes!
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Svo a), (Array SvoNode)] ())
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>sets the <code>nodes</code> property of a <code>Svo</code> in place.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#set-origin">
+                        <h3 id="set-origin">
+                            set-origin
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [Svo, (Vector3 Double)] Svo)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>sets the <code>origin</code> property of a <code>Svo</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#set-origin!">
+                        <h3 id="set-origin!">
+                            set-origin!
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Svo a), (Vector3 Double)] ())
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>sets the <code>origin</code> property of a <code>Svo</code> in place.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#set-size">
+                        <h3 id="set-size">
+                            set-size
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [Svo, Double] Svo)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>sets the <code>size</code> property of a <code>Svo</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#set-size!">
+                        <h3 id="set-size!">
+                            set-size!
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Svo a), Double] ())
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>sets the <code>size</code> property of a <code>Svo</code> in place.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#size">
+                        <h3 id="size">
+                            size
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Svo a)] (Ref Double a))
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>gets the <code>size</code> property of a <code>Svo</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#str">
+                        <h3 id="str">
+                            str
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Svo a)] String)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>converts a <code>Svo</code> to a string.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#subdivide!">
+                        <h3 id="subdivide!">
+                            subdivide!
+                        </h3>
+                    </a>
+                    <div class="description">
+                        defn
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Svo a), Int] Int)
+                    </p>
+                    <pre class="args">
+                        (subdivide! svo node-idx)
+                    </pre>
+                    <p class="doc">
+                        
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#update-default-idx">
+                        <h3 id="update-default-idx">
+                            update-default-idx
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [Svo, (Ref (Fn [Int] Int a) b)] Svo)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>updates the <code>default-idx</code> property of a <code>Svo</code> using a function <code>f</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#update-max-depth">
+                        <h3 id="update-max-depth">
+                            update-max-depth
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [Svo, (Ref (Fn [Int] Int a) b)] Svo)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>updates the <code>max-depth</code> property of a <code>Svo</code> using a function <code>f</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#update-nodes">
+                        <h3 id="update-nodes">
+                            update-nodes
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [Svo, (Ref (Fn [(Array SvoNode)] (Array SvoNode) a) b)] Svo)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>updates the <code>nodes</code> property of a <code>Svo</code> using a function <code>f</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#update-origin">
+                        <h3 id="update-origin">
+                            update-origin
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [Svo, (Ref (Fn [(Vector3 Double)] (Vector3 Double) a) b)] Svo)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>updates the <code>origin</code> property of a <code>Svo</code> using a function <code>f</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#update-size">
+                        <h3 id="update-size">
+                            update-size
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [Svo, (Ref (Fn [Double] Double a) b)] Svo)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>updates the <code>size</code> property of a <code>Svo</code> using a function <code>f</code>.</p>
+
+                    </p>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,548 @@
+<!DOCTYPE HTML>
+
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+        <link rel="stylesheet" href="../style.css">
+    </head>
+    <body>
+        <div class="content">
+            <div class="logo">
+                <a href="https://github.com/carpentry-org/carp-raymarching">
+                    <img src="">
+                </a>
+                <div class="title">
+                    carp-raymarching
+                </div>
+                <div class="index">
+                    <ul>
+                        <li>
+                            <details>
+                                <summary>
+                                    <a href="Sdf.html">
+                                        Sdf
+                                    </a>
+                                </summary>
+                                <ul>
+                                    <li>
+                                        <a href="Sdf.Wgsl.html">
+                                            Wgsl
+                                        </a>
+                                    </li>
+                                </ul>
+                            </details>
+                        </li>
+                        <li>
+                            <a href="Svo.html">
+                                Svo
+                            </a>
+                        </li>
+                        <li>
+                            <a href="SvoNode.html">
+                                SvoNode
+                            </a>
+                        </li>
+                        <li>
+                            <a href="Ray.html">
+                                Ray
+                            </a>
+                        </li>
+                        <li>
+                            <details>
+                                <summary>
+                                    <a href="Raymarch.html">
+                                        Raymarch
+                                    </a>
+                                </summary>
+                                <ul>
+                                    <li>
+                                        <a href="Raymarch.Wgsl.html">
+                                            Wgsl
+                                        </a>
+                                    </li>
+                                </ul>
+                            </details>
+                        </li>
+                        <li>
+                            <a href="RaymarchHit.html">
+                                RaymarchHit
+                            </a>
+                        </li>
+                        <li>
+                            <a href="RaymarchConfig.html">
+                                RaymarchConfig
+                            </a>
+                        </li>
+                        <li>
+                            <details>
+                                <summary>
+                                    <a href="Visibility.html">
+                                        Visibility
+                                    </a>
+                                </summary>
+                                <ul>
+                                    <li>
+                                        <a href="Visibility.Wgsl.html">
+                                            Wgsl
+                                        </a>
+                                    </li>
+                                </ul>
+                            </details>
+                        </li>
+                        <li>
+                            <a href="VisibilityConfig.html">
+                                VisibilityConfig
+                            </a>
+                        </li>
+                        <li>
+                            <a href="Material.html">
+                                Material
+                            </a>
+                        </li>
+                        <li>
+                            <a href="Shading.html">
+                                Shading
+                            </a>
+                        </li>
+                        <li>
+                            <a href="Light.html">
+                                Light
+                            </a>
+                        </li>
+                        <li>
+                            <a href="Scene.html">
+                                Scene
+                            </a>
+                        </li>
+                        <li>
+                            <a href="SceneObject.html">
+                                SceneObject
+                            </a>
+                        </li>
+                        <li>
+                            <a href="SceneHit.html">
+                                SceneHit
+                            </a>
+                        </li>
+                        <li>
+                            <a href="Renderer.html">
+                                Renderer
+                            </a>
+                        </li>
+                        <li>
+                            <a href="RenderConfig.html">
+                                RenderConfig
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="module">
+                <h1>
+                    SvoNode
+                </h1>
+                <div class="module-description">
+                    
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#NO-CHILD">
+                        <h3 id="NO-CHILD">
+                            NO-CHILD
+                        </h3>
+                    </a>
+                    <div class="description">
+                        def
+                    </div>
+                    <p class="sig">
+                        Uint32
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#child-ptr">
+                        <h3 id="child-ptr">
+                            child-ptr
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref SvoNode a)] (Ref Uint32 a))
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>gets the <code>child-ptr</code> property of a <code>SvoNode</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#copy">
+                        <h3 id="copy">
+                            copy
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref SvoNode a)] SvoNode)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>copies a <code>SvoNode</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#data-index">
+                        <h3 id="data-index">
+                            data-index
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref SvoNode a)] (Ref Int a))
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>gets the <code>data-index</code> property of a <code>SvoNode</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#delete">
+                        <h3 id="delete">
+                            delete
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [SvoNode] ())
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>deletes a <code>SvoNode</code>. Should usually not be called manually.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#flags">
+                        <h3 id="flags">
+                            flags
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref SvoNode a)] (Ref Uint32 a))
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>gets the <code>flags</code> property of a <code>SvoNode</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#init">
+                        <h3 id="init">
+                            init
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [Uint32, Int, Uint32] SvoNode)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>creates a <code>SvoNode</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#init-default">
+                        <h3 id="init-default">
+                            init-default
+                        </h3>
+                    </a>
+                    <div class="description">
+                        defn
+                    </div>
+                    <p class="sig">
+                        (Fn [Int] SvoNode)
+                    </p>
+                    <pre class="args">
+                        (init-default data-idx)
+                    </pre>
+                    <p class="doc">
+                        
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#leaf?">
+                        <h3 id="leaf?">
+                            leaf?
+                        </h3>
+                    </a>
+                    <div class="description">
+                        defn
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref SvoNode a)] Bool)
+                    </p>
+                    <pre class="args">
+                        (leaf? node)
+                    </pre>
+                    <p class="doc">
+                        
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#prn">
+                        <h3 id="prn">
+                            prn
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref SvoNode a)] String)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>converts a <code>SvoNode</code> to a string.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#set-child-ptr">
+                        <h3 id="set-child-ptr">
+                            set-child-ptr
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [SvoNode, Uint32] SvoNode)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>sets the <code>child-ptr</code> property of a <code>SvoNode</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#set-child-ptr!">
+                        <h3 id="set-child-ptr!">
+                            set-child-ptr!
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref SvoNode a), Uint32] ())
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>sets the <code>child-ptr</code> property of a <code>SvoNode</code> in place.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#set-data-index">
+                        <h3 id="set-data-index">
+                            set-data-index
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [SvoNode, Int] SvoNode)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>sets the <code>data-index</code> property of a <code>SvoNode</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#set-data-index!">
+                        <h3 id="set-data-index!">
+                            set-data-index!
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref SvoNode a), Int] ())
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>sets the <code>data-index</code> property of a <code>SvoNode</code> in place.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#set-flags">
+                        <h3 id="set-flags">
+                            set-flags
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [SvoNode, Uint32] SvoNode)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>sets the <code>flags</code> property of a <code>SvoNode</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#set-flags!">
+                        <h3 id="set-flags!">
+                            set-flags!
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref SvoNode a), Uint32] ())
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>sets the <code>flags</code> property of a <code>SvoNode</code> in place.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#str">
+                        <h3 id="str">
+                            str
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref SvoNode a)] String)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>converts a <code>SvoNode</code> to a string.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#update-child-ptr">
+                        <h3 id="update-child-ptr">
+                            update-child-ptr
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [SvoNode, (Ref (Fn [Uint32] Uint32 a) b)] SvoNode)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>updates the <code>child-ptr</code> property of a <code>SvoNode</code> using a function <code>f</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#update-data-index">
+                        <h3 id="update-data-index">
+                            update-data-index
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [SvoNode, (Ref (Fn [Int] Int a) b)] SvoNode)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>updates the <code>data-index</code> property of a <code>SvoNode</code> using a function <code>f</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#update-flags">
+                        <h3 id="update-flags">
+                            update-flags
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [SvoNode, (Ref (Fn [Uint32] Uint32 a) b)] SvoNode)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>updates the <code>flags</code> property of a <code>SvoNode</code> using a function <code>f</code>.</p>
+
+                    </p>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

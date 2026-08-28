@@ -1,0 +1,710 @@
+<!DOCTYPE HTML>
+
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+        <link rel="stylesheet" href="../style.css">
+    </head>
+    <body>
+        <div class="content">
+            <div class="logo">
+                <a href="https://github.com/carpentry-org/carp-raymarching">
+                    <img src="">
+                </a>
+                <div class="title">
+                    carp-raymarching
+                </div>
+                <div class="index">
+                    <ul>
+                        <li>
+                            <details>
+                                <summary>
+                                    <a href="Sdf.html">
+                                        Sdf
+                                    </a>
+                                </summary>
+                                <ul>
+                                    <li>
+                                        <a href="Sdf.Wgsl.html">
+                                            Wgsl
+                                        </a>
+                                    </li>
+                                </ul>
+                            </details>
+                        </li>
+                        <li>
+                            <a href="Svo.html">
+                                Svo
+                            </a>
+                        </li>
+                        <li>
+                            <a href="SvoNode.html">
+                                SvoNode
+                            </a>
+                        </li>
+                        <li>
+                            <a href="Ray.html">
+                                Ray
+                            </a>
+                        </li>
+                        <li>
+                            <details>
+                                <summary>
+                                    <a href="Raymarch.html">
+                                        Raymarch
+                                    </a>
+                                </summary>
+                                <ul>
+                                    <li>
+                                        <a href="Raymarch.Wgsl.html">
+                                            Wgsl
+                                        </a>
+                                    </li>
+                                </ul>
+                            </details>
+                        </li>
+                        <li>
+                            <a href="RaymarchHit.html">
+                                RaymarchHit
+                            </a>
+                        </li>
+                        <li>
+                            <a href="RaymarchConfig.html">
+                                RaymarchConfig
+                            </a>
+                        </li>
+                        <li>
+                            <details>
+                                <summary>
+                                    <a href="Visibility.html">
+                                        Visibility
+                                    </a>
+                                </summary>
+                                <ul>
+                                    <li>
+                                        <a href="Visibility.Wgsl.html">
+                                            Wgsl
+                                        </a>
+                                    </li>
+                                </ul>
+                            </details>
+                        </li>
+                        <li>
+                            <a href="VisibilityConfig.html">
+                                VisibilityConfig
+                            </a>
+                        </li>
+                        <li>
+                            <a href="Material.html">
+                                Material
+                            </a>
+                        </li>
+                        <li>
+                            <a href="Shading.html">
+                                Shading
+                            </a>
+                        </li>
+                        <li>
+                            <a href="Light.html">
+                                Light
+                            </a>
+                        </li>
+                        <li>
+                            <a href="Scene.html">
+                                Scene
+                            </a>
+                        </li>
+                        <li>
+                            <a href="SceneObject.html">
+                                SceneObject
+                            </a>
+                        </li>
+                        <li>
+                            <a href="SceneHit.html">
+                                SceneHit
+                            </a>
+                        </li>
+                        <li>
+                            <a href="Renderer.html">
+                                Renderer
+                            </a>
+                        </li>
+                        <li>
+                            <a href="RenderConfig.html">
+                                RenderConfig
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="module">
+                <h1>
+                    Material
+                </h1>
+                <div class="module-description">
+                    <p>represents the visual properties of a surface.</p>
+
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#albedo">
+                        <h3 id="albedo">
+                            albedo
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Material a)] (Ref (Vector3 Double) a))
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>gets the <code>albedo</code> property of a <code>Material</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#copy">
+                        <h3 id="copy">
+                            copy
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Material a)] Material)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>copies a <code>Material</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#default">
+                        <h3 id="default">
+                            default
+                        </h3>
+                    </a>
+                    <div class="description">
+                        defn
+                    </div>
+                    <p class="sig">
+                        (Fn [] Material)
+                    </p>
+                    <pre class="args">
+                        (default)
+                    </pre>
+                    <p class="doc">
+                        <p>returns a neutral grey material.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#delete">
+                        <h3 id="delete">
+                            delete
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [Material] ())
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>deletes a <code>Material</code>. Should usually not be called manually.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#emission">
+                        <h3 id="emission">
+                            emission
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Material a)] (Ref (Vector3 Double) a))
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>gets the <code>emission</code> property of a <code>Material</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#init">
+                        <h3 id="init">
+                            init
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Vector3 Double), Double, Double, Double, (Vector3 Double)] Material)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>creates a <code>Material</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#make">
+                        <h3 id="make">
+                            make
+                        </h3>
+                    </a>
+                    <div class="description">
+                        defn
+                    </div>
+                    <p class="sig">
+                        (Fn [(Vector3 Double), Double, Double, Double] Material)
+                    </p>
+                    <pre class="args">
+                        (make albedo roughness metallic reflectivity)
+                    </pre>
+                    <p class="doc">
+                        
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#make-emissive">
+                        <h3 id="make-emissive">
+                            make-emissive
+                        </h3>
+                    </a>
+                    <div class="description">
+                        defn
+                    </div>
+                    <p class="sig">
+                        (Fn [(Vector3 Double), Double, Double, Double, (Vector3 Double)] Material)
+                    </p>
+                    <pre class="args">
+                        (make-emissive albedo roughness metallic reflectivity emit)
+                    </pre>
+                    <p class="doc">
+                        
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#metallic">
+                        <h3 id="metallic">
+                            metallic
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Material a)] (Ref Double a))
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>gets the <code>metallic</code> property of a <code>Material</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#prn">
+                        <h3 id="prn">
+                            prn
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Material a)] String)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>converts a <code>Material</code> to a string.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#reflectivity">
+                        <h3 id="reflectivity">
+                            reflectivity
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Material a)] (Ref Double a))
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>gets the <code>reflectivity</code> property of a <code>Material</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#roughness">
+                        <h3 id="roughness">
+                            roughness
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Material a)] (Ref Double a))
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>gets the <code>roughness</code> property of a <code>Material</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#set-albedo">
+                        <h3 id="set-albedo">
+                            set-albedo
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [Material, (Vector3 Double)] Material)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>sets the <code>albedo</code> property of a <code>Material</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#set-albedo!">
+                        <h3 id="set-albedo!">
+                            set-albedo!
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Material a), (Vector3 Double)] ())
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>sets the <code>albedo</code> property of a <code>Material</code> in place.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#set-emission">
+                        <h3 id="set-emission">
+                            set-emission
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [Material, (Vector3 Double)] Material)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>sets the <code>emission</code> property of a <code>Material</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#set-emission!">
+                        <h3 id="set-emission!">
+                            set-emission!
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Material a), (Vector3 Double)] ())
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>sets the <code>emission</code> property of a <code>Material</code> in place.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#set-metallic">
+                        <h3 id="set-metallic">
+                            set-metallic
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [Material, Double] Material)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>sets the <code>metallic</code> property of a <code>Material</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#set-metallic!">
+                        <h3 id="set-metallic!">
+                            set-metallic!
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Material a), Double] ())
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>sets the <code>metallic</code> property of a <code>Material</code> in place.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#set-reflectivity">
+                        <h3 id="set-reflectivity">
+                            set-reflectivity
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [Material, Double] Material)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>sets the <code>reflectivity</code> property of a <code>Material</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#set-reflectivity!">
+                        <h3 id="set-reflectivity!">
+                            set-reflectivity!
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Material a), Double] ())
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>sets the <code>reflectivity</code> property of a <code>Material</code> in place.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#set-roughness">
+                        <h3 id="set-roughness">
+                            set-roughness
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [Material, Double] Material)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>sets the <code>roughness</code> property of a <code>Material</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#set-roughness!">
+                        <h3 id="set-roughness!">
+                            set-roughness!
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Material a), Double] ())
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>sets the <code>roughness</code> property of a <code>Material</code> in place.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#str">
+                        <h3 id="str">
+                            str
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Material a)] String)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>converts a <code>Material</code> to a string.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#update-albedo">
+                        <h3 id="update-albedo">
+                            update-albedo
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [Material, (Ref (Fn [(Vector3 Double)] (Vector3 Double) a) b)] Material)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>updates the <code>albedo</code> property of a <code>Material</code> using a function <code>f</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#update-emission">
+                        <h3 id="update-emission">
+                            update-emission
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [Material, (Ref (Fn [(Vector3 Double)] (Vector3 Double) a) b)] Material)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>updates the <code>emission</code> property of a <code>Material</code> using a function <code>f</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#update-metallic">
+                        <h3 id="update-metallic">
+                            update-metallic
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [Material, (Ref (Fn [Double] Double a) b)] Material)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>updates the <code>metallic</code> property of a <code>Material</code> using a function <code>f</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#update-reflectivity">
+                        <h3 id="update-reflectivity">
+                            update-reflectivity
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [Material, (Ref (Fn [Double] Double a) b)] Material)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>updates the <code>reflectivity</code> property of a <code>Material</code> using a function <code>f</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#update-roughness">
+                        <h3 id="update-roughness">
+                            update-roughness
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [Material, (Ref (Fn [Double] Double a) b)] Material)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>updates the <code>roughness</code> property of a <code>Material</code> using a function <code>f</code>.</p>
+
+                    </p>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

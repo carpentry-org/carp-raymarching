@@ -1,0 +1,412 @@
+<!DOCTYPE HTML>
+
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+        <link rel="stylesheet" href="../style.css">
+    </head>
+    <body>
+        <div class="content">
+            <div class="logo">
+                <a href="https://github.com/carpentry-org/carp-raymarching">
+                    <img src="">
+                </a>
+                <div class="title">
+                    carp-raymarching
+                </div>
+                <div class="index">
+                    <ul>
+                        <li>
+                            <details>
+                                <summary>
+                                    <a href="Sdf.html">
+                                        Sdf
+                                    </a>
+                                </summary>
+                                <ul>
+                                    <li>
+                                        <a href="Sdf.Wgsl.html">
+                                            Wgsl
+                                        </a>
+                                    </li>
+                                </ul>
+                            </details>
+                        </li>
+                        <li>
+                            <a href="Svo.html">
+                                Svo
+                            </a>
+                        </li>
+                        <li>
+                            <a href="SvoNode.html">
+                                SvoNode
+                            </a>
+                        </li>
+                        <li>
+                            <a href="Ray.html">
+                                Ray
+                            </a>
+                        </li>
+                        <li>
+                            <details>
+                                <summary>
+                                    <a href="Raymarch.html">
+                                        Raymarch
+                                    </a>
+                                </summary>
+                                <ul>
+                                    <li>
+                                        <a href="Raymarch.Wgsl.html">
+                                            Wgsl
+                                        </a>
+                                    </li>
+                                </ul>
+                            </details>
+                        </li>
+                        <li>
+                            <a href="RaymarchHit.html">
+                                RaymarchHit
+                            </a>
+                        </li>
+                        <li>
+                            <a href="RaymarchConfig.html">
+                                RaymarchConfig
+                            </a>
+                        </li>
+                        <li>
+                            <details>
+                                <summary>
+                                    <a href="Visibility.html">
+                                        Visibility
+                                    </a>
+                                </summary>
+                                <ul>
+                                    <li>
+                                        <a href="Visibility.Wgsl.html">
+                                            Wgsl
+                                        </a>
+                                    </li>
+                                </ul>
+                            </details>
+                        </li>
+                        <li>
+                            <a href="VisibilityConfig.html">
+                                VisibilityConfig
+                            </a>
+                        </li>
+                        <li>
+                            <a href="Material.html">
+                                Material
+                            </a>
+                        </li>
+                        <li>
+                            <a href="Shading.html">
+                                Shading
+                            </a>
+                        </li>
+                        <li>
+                            <a href="Light.html">
+                                Light
+                            </a>
+                        </li>
+                        <li>
+                            <a href="Scene.html">
+                                Scene
+                            </a>
+                        </li>
+                        <li>
+                            <a href="SceneObject.html">
+                                SceneObject
+                            </a>
+                        </li>
+                        <li>
+                            <a href="SceneHit.html">
+                                SceneHit
+                            </a>
+                        </li>
+                        <li>
+                            <a href="Renderer.html">
+                                Renderer
+                            </a>
+                        </li>
+                        <li>
+                            <a href="RenderConfig.html">
+                                RenderConfig
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="module">
+                <h1>
+                    Light
+                </h1>
+                <div class="module-description">
+                    <p>represents a point light source.</p>
+
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#color">
+                        <h3 id="color">
+                            color
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Light a)] (Ref (Vector3 Double) a))
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>gets the <code>color</code> property of a <code>Light</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#copy">
+                        <h3 id="copy">
+                            copy
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Light a)] Light)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>copies a <code>Light</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#delete">
+                        <h3 id="delete">
+                            delete
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [Light] ())
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>deletes a <code>Light</code>. Should usually not be called manually.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#init">
+                        <h3 id="init">
+                            init
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Vector3 Double), (Vector3 Double)] Light)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>creates a <code>Light</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#pos">
+                        <h3 id="pos">
+                            pos
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Light a)] (Ref (Vector3 Double) a))
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>gets the <code>pos</code> property of a <code>Light</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#prn">
+                        <h3 id="prn">
+                            prn
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Light a)] String)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>converts a <code>Light</code> to a string.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#set-color">
+                        <h3 id="set-color">
+                            set-color
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [Light, (Vector3 Double)] Light)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>sets the <code>color</code> property of a <code>Light</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#set-color!">
+                        <h3 id="set-color!">
+                            set-color!
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Light a), (Vector3 Double)] ())
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>sets the <code>color</code> property of a <code>Light</code> in place.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#set-pos">
+                        <h3 id="set-pos">
+                            set-pos
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [Light, (Vector3 Double)] Light)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>sets the <code>pos</code> property of a <code>Light</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#set-pos!">
+                        <h3 id="set-pos!">
+                            set-pos!
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Light a), (Vector3 Double)] ())
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>sets the <code>pos</code> property of a <code>Light</code> in place.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#str">
+                        <h3 id="str">
+                            str
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [(Ref Light a)] String)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>converts a <code>Light</code> to a string.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#update-color">
+                        <h3 id="update-color">
+                            update-color
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [Light, (Ref (Fn [(Vector3 Double)] (Vector3 Double) a) b)] Light)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>updates the <code>color</code> property of a <code>Light</code> using a function <code>f</code>.</p>
+
+                    </p>
+                </div>
+                <div class="binder">
+                    <a class="anchor" href="#update-pos">
+                        <h3 id="update-pos">
+                            update-pos
+                        </h3>
+                    </a>
+                    <div class="description">
+                        instantiate
+                    </div>
+                    <p class="sig">
+                        (Fn [Light, (Ref (Fn [(Vector3 Double)] (Vector3 Double) a) b)] Light)
+                    </p>
+                    <span>
+                        
+                    </span>
+                    <p class="doc">
+                        <p>updates the <code>pos</code> property of a <code>Light</code> using a function <code>f</code>.</p>
+
+                    </p>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
