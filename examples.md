@@ -146,7 +146,7 @@ Extracting the WebGPU Shading Language (WGSL) snippets for compile-time GPU shad
 ## 1. Basic Set & Sample
 
 ```carp
-(load "carp-svo/svo.carp")
+(load "git@github.com:carpentry-org/carp-raymarching@master" "svo.carp")
 (use Svo)
 
 (defn main []
@@ -166,7 +166,7 @@ Extracting the WebGPU Shading Language (WGSL) snippets for compile-time GPU shad
 ## 2. Sparse Space & Early Sample Termination
 
 ```carp
-(load "carp-svo/svo.carp")
+(load "git@github.com:carpentry-org/carp-raymarching@master" "svo.carp")
 (use Svo)
 
 (defn main []
@@ -187,7 +187,7 @@ Extracting the WebGPU Shading Language (WGSL) snippets for compile-time GPU shad
 ## 3. Clearing and Re-using the Octree Pool
 
 ```carp
-(load "carp-svo/svo.carp")
+(load "git@github.com:carpentry-org/carp-raymarching@master" "svo.carp")
 (use Svo)
 
 (defn main []

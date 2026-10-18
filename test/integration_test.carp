@@ -1,4 +1,4 @@
-(load "../renderer.carp")
+(load "renderer.carp")
 (load "Test.carp")
 (use Test)
 (use Vector3)

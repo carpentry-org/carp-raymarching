@@ -92,7 +92,7 @@
                                                   &ray
                                                   p
                                                   n
-                                                  mat
+                                                  &mat
                                                   &light
                                                   &config))
                             (Vector3.init 0.1 0.1 0.15))]

@@ -1,5 +1,5 @@
 (load "../renderer.carp")
-(load "../../carp-job-system/rayon.carp")
+(load "git@github.com:carpentry-org/carp-job-system@master" "rayon.carp")
 (use Vector3)
 (use Double)
 

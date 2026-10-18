@@ -10,9 +10,28 @@ A consolidated Raymarching Library suite for the Carp programming language.
 - **[Sdf](#sdf)**: See module documentation below.
 - **[Svo](#svo)**: See module documentation below.
 
+## Installation
+
+```
+(load "git@github.com:carpentry-org/carp-raymarching@master")
+```
+
+That pulls in every module. A single one can be loaded on its own:
+
+```
+(load "git@github.com:carpentry-org/carp-raymarching@master" "sdf.carp")
+```
+
+> **Note:** `test/integration_test.carp` calls `Renderer.render-pixel`, which
+> does not exist in `renderer.carp`. That one suite does not run and is left
+> out of CI; the other five pass. The function looks like it was lost when the
+> separate libraries were squashed into this repo.
+
 ## Examples
 
-See [examples.md](examples.md) for module usage examples.
+See [examples.md](examples.md) for module usage examples, and the
+[API documentation](https://carpentry.dev/carp-raymarching) for the full
+reference.
 
 ---
 
@@ -30,7 +49,7 @@ A pure geometric traversal kernel for the Carp programming language. This librar
 ## Installation
 
 ```clojure
-(load "https://github.com/sqrew/carp-raymarch@master")
+(load "git@github.com:carpentry-org/carp-raymarching@master" "raymarch.carp")
 ```
 
 ## Usage
@@ -123,7 +142,7 @@ A high-performance Signed Distance Field (SDF) module for the Carp programming l
 
 ## Installation
 ```clojure
-(load "https://github.com/sqrew/carp-sdf@master")
+(load "git@github.com:carpentry-org/carp-raymarching@master" "sdf.carp")
 ```
 
 ## Examples
